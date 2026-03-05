@@ -1,0 +1,1981 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>杀戮尖塔数据库管理</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    :root {
+      --bg-darkest: #0a0a0f;
+      --bg-dark: #12121a;
+      --bg-panel: #1a1a25;
+      --bg-card: #252533;
+      --bg-hover: #2d2d3d;
+      --bg-input: #1e1e2b;
+      
+      --accent-red: #ff4757;
+      --accent-green: #00d9a5;
+      --accent-blue: #00d4ff;
+      --accent-purple: #b967ff;
+      --accent-orange: #ff9f43;
+      --accent-yellow: #ffd32a;
+      
+      --text-light: #ffffff;
+      --text-primary: #e8e8f0;
+      --text-muted: #8888a0;
+      --text-dark: #4a4a5c;
+      
+      --border-color: #2a2a3c;
+      --border-light: #3d3d55;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-darkest);
+      color: var(--text-primary);
+      min-height: 100vh;
+    }
+    
+    .header {
+      background: linear-gradient(135deg, var(--bg-panel) 0%, var(--bg-dark) 100%);
+      padding: 20px;
+      border-bottom: 2px solid var(--accent-green);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .header h1 {
+      font-size: 24px;
+      color: var(--accent-green);
+      text-shadow: 0 0 20px rgba(0, 217, 165, 0.4);
+    }
+    
+    .header-actions {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .nav-tabs {
+      display: flex;
+      background: var(--bg-panel);
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .nav-tab {
+      padding: 15px 30px;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s;
+      border-bottom: 3px solid transparent;
+    }
+    
+    .nav-tab:hover {
+      color: var(--text-light);
+      background: rgba(0, 217, 165, 0.1);
+    }
+    
+    .nav-tab.active {
+      color: var(--accent-green);
+      border-bottom-color: var(--accent-green);
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding: 15px;
+      background: var(--bg-panel);
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+    
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-green) 0%, #00b386 100%);
+      color: #0a0a0f;
+      font-weight: 600;
+    }
+    
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #00f0b5 0%, #00d9a5 100%);
+      box-shadow: 0 0 20px rgba(0, 217, 165, 0.4);
+    }
+    
+    .btn-secondary {
+      background: linear-gradient(135deg, var(--accent-blue) 0%, #00a8cc 100%);
+      color: #0a0a0f;
+      font-weight: 600;
+    }
+    
+    .btn-secondary:hover {
+      background: linear-gradient(135deg, #5ee7ff 0%, #00d4ff 100%);
+      box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+    }
+    
+    .btn-danger {
+      background: linear-gradient(135deg, var(--accent-red) 0%, #ff2e43 100%);
+      color: white;
+      font-weight: 600;
+    }
+    
+    .btn-danger:hover {
+      background: linear-gradient(135deg, #ff6b7a 0%, #ff4757 100%);
+      box-shadow: 0 0 20px rgba(255, 71, 87, 0.4);
+    }
+    
+    .btn-success {
+      background: linear-gradient(135deg, var(--accent-green) 0%, #00b386 100%);
+      color: #0a0a0f;
+      font-weight: 600;
+    }
+    
+    .btn-success:hover {
+      background: linear-gradient(135deg, #00f0b5 0%, #00d9a5 100%);
+      box-shadow: 0 0 20px rgba(0, 217, 165, 0.4);
+    }
+    
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .search-box input {
+      padding: 10px 15px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      background: var(--bg-dark);
+      color: var(--text-light);
+      width: 250px;
+    }
+    
+    .search-box input:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+    }
+    
+    .search-box select {
+      padding: 10px 15px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      background: var(--bg-dark);
+      color: var(--text-light);
+    }
+    
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--bg-panel);
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+    
+    .data-table th,
+    .data-table td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .data-table th {
+      background: var(--bg-card);
+      font-weight: 600;
+      color: var(--accent-green);
+    }
+    
+    .data-table tr:hover {
+      background: rgba(0, 217, 165, 0.08);
+    }
+    
+    .data-table tr:last-child td {
+      border-bottom: none;
+    }
+    
+    .actions {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .btn-small {
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+    
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s;
+    }
+    
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .modal {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      width: 90%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow: hidden;
+      transform: scale(0.9);
+      transition: all 0.3s;
+    }
+    
+    .modal-overlay.active .modal {
+      transform: scale(1);
+    }
+    
+    .modal-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .modal-header h2 {
+      color: var(--accent-green);
+    }
+    
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 24px;
+      cursor: pointer;
+    }
+    
+    .modal-close:hover {
+      color: var(--text-light);
+    }
+    
+    .modal-body {
+      padding: 20px;
+      max-height: 60vh;
+      overflow-y: auto;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      background: var(--bg-dark);
+      color: var(--text-light);
+      font-size: 14px;
+    }
+    
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+    }
+    
+    .form-group textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+    
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    
+    .color-picker {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .color-picker input[type="color"] {
+      width: 60px;
+      height: 40px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    
+    .modal-footer {
+      padding: 20px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+    
+    .badge {
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    
+    .badge-attack { background: linear-gradient(135deg, #ff4757 0%, #ff2e43 100%); }
+    .badge-skill { background: linear-gradient(135deg, #00d4ff 0%, #00a8cc 100%); color: #0a0a0f; }
+    .badge-power { background: linear-gradient(135deg, #ffd32a 0%, #ff9f43 100%); color: #0a0a0f; }
+    .badge-curse { background: linear-gradient(135deg, #b967ff 0%, #9d4edd 100%); }
+    .badge-status { background: #8888a0; }
+    
+    .badge-basic { background: #8888a0; }
+    .badge-common { background: #6a6a7c; }
+    .badge-uncommon { background: linear-gradient(135deg, #00d9a5 0%, #00b386 100%); color: #0a0a0f; }
+    .badge-rare { background: linear-gradient(135deg, #ff9f43 0%, #ff7b25 100%); color: #0a0a0f; }
+    .badge-special { background: linear-gradient(135deg, #b967ff 0%, #9d4edd 100%); }
+    
+    .badge-shared_buff, .badge-player_buff, .badge-enemy_buff { background: linear-gradient(135deg, #00d9a5 0%, #00b386 100%); color: #0a0a0f; }
+    .badge-shared_debuff, .badge-player_debuff, .badge-enemy_debuff { background: linear-gradient(135deg, #ff4757 0%, #ff2e43 100%); }
+    .badge-other { background: #8888a0; }
+    
+    .cost-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: 50%;
+      font-weight: bold;
+      font-size: 14px;
+      color: var(--text-light);
+    }
+    
+    .cost-zero {
+      background: linear-gradient(135deg, #00d9a5 0%, #00b386 100%);
+      border-color: transparent;
+      color: #0a0a0f;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 60px;
+      color: var(--text-muted);
+    }
+    
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 20px;
+    }
+    
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+    }
+    
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--border-color);
+      border-top-color: var(--accent-green);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px 25px;
+      border-radius: 8px;
+      color: white;
+      font-weight: 500;
+      z-index: 2000;
+      transform: translateX(150%);
+      transition: transform 0.3s;
+    }
+    
+    .notification.show {
+      transform: translateX(0);
+    }
+    
+    .notification.success {
+      background: linear-gradient(135deg, #00d9a5 0%, #00b386 100%);
+      color: #0a0a0f;
+    }
+    
+    .notification.error {
+      background: linear-gradient(135deg, #ff4757 0%, #ff2e43 100%);
+    }
+    
+    .checkbox-group {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+    
+    .checkbox-label input {
+      width: auto;
+    }
+
+    .character-preview {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .character-color-box {
+      width: 30px;
+      height: 30px;
+      border-radius: 6px;
+      border: 2px solid rgba(255,255,255,0.2);
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🎴 杀戮尖塔数据库管理</h1>
+    <div class="header-actions">
+      <button class="btn btn-secondary" onclick="importFromJson()">📥 从JSON导入</button>
+    </div>
+  </div>
+
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="switchTab('characters')">角色分类</button>
+    <button class="nav-tab" onclick="switchTab('cards')">卡牌管理</button>
+    <button class="nav-tab" onclick="switchTab('relics')">遗物管理</button>
+    <button class="nav-tab" onclick="switchTab('potions')">药水管理</button>
+    <button class="nav-tab" onclick="switchTab('buffs')">Buff/Debuff</button>
+    <button class="nav-tab" onclick="switchTab('enemies')">敌人数据</button>
+  </div>
+
+  <div class="container">
+    <!-- 角色分类管理 -->
+    <div id="characters-tab" class="tab-content active">
+      <div class="toolbar">
+        <h3>角色/分类列表</h3>
+        <button class="btn btn-primary" onclick="openCharacterModal()">+ 添加角色</button>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>排序</th>
+            <th>ID</th>
+            <th>名称</th>
+            <th>英文名称</th>
+            <th>颜色预览</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="characters-table-body">
+          <tr><td colspan="6" class="loading"><div class="spinner"></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 卡牌管理 -->
+    <div id="cards-tab" class="tab-content">
+      <div class="toolbar">
+        <div class="search-box">
+          <select id="card-character-filter" onchange="searchCards()">
+            <option value="">所有角色</option>
+          </select>
+          <input type="text" id="card-search" placeholder="搜索卡牌..." onkeyup="searchCards()">
+        </div>
+        <button class="btn btn-primary" onclick="openCardModal()">+ 添加卡牌</button>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>费用</th>
+            <th>名称</th>
+            <th>类型</th>
+            <th>稀有度</th>
+            <th>所属角色</th>
+            <th>描述</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="cards-table-body">
+          <tr><td colspan="7" class="loading"><div class="spinner"></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 遗物管理 -->
+    <div id="relics-tab" class="tab-content">
+      <div class="toolbar">
+        <div class="search-box">
+          <input type="text" id="relic-search" placeholder="搜索遗物..." onkeyup="searchRelics()">
+        </div>
+        <button class="btn btn-primary" onclick="openRelicModal()">+ 添加遗物</button>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>名称</th>
+            <th>稀有度</th>
+            <th>特殊类型</th>
+            <th>所属角色</th>
+            <th>描述</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="relics-table-body">
+          <tr><td colspan="6" class="loading"><div class="spinner"></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 药水管理 -->
+    <div id="potions-tab" class="tab-content">
+      <div class="toolbar">
+        <div class="search-box">
+          <input type="text" id="potion-search" placeholder="搜索药水..." onkeyup="searchPotions()">
+        </div>
+        <button class="btn btn-primary" onclick="openPotionModal()">+ 添加药水</button>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>名称</th>
+            <th>描述</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="potions-table-body">
+          <tr><td colspan="4" class="loading"><div class="spinner"></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Buffs/Debuffs 管理 -->
+    <div id="buffs-tab" class="tab-content">
+      <div class="toolbar">
+        <div class="search-box">
+          <select id="buff-type-filter" onchange="loadBuffs()">
+            <option value="">所有类型</option>
+            <option value="shared_buff">共享增益</option>
+            <option value="player_buff">玩家增益</option>
+            <option value="enemy_buff">敌人增益</option>
+            <option value="shared_debuff">共享减益</option>
+            <option value="player_debuff">玩家减益</option>
+            <option value="enemy_debuff">敌人减益</option>
+            <option value="other">其他</option>
+          </select>
+          <input type="text" id="buff-search" placeholder="搜索Buff/Debuff..." onkeyup="searchBuffs()">
+        </div>
+        <button class="btn btn-primary" onclick="openBuffModal()">+ 添加Buff/Debuff</button>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>名称</th>
+            <th>类型</th>
+            <th>可叠加</th>
+            <th>详细说明</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="buffs-table-body">
+          <tr><td colspan="5" class="loading"><div class="spinner"></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Enemies 管理 -->
+    <div id="enemies-tab" class="tab-content">
+      <div class="toolbar">
+        <div class="search-box">
+          <select id="enemy-category-filter" onchange="loadEnemies()">
+            <option value="">所有种类</option>
+          </select>
+          <input type="text" id="enemy-search" placeholder="搜索敌人..." onkeyup="searchEnemies()">
+        </div>
+        <button class="btn btn-primary" onclick="openEnemyModal()">+ 添加敌人</button>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>名称</th>
+            <th>种类</th>
+            <th>描述</th>
+            <th>详细情况</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="enemies-table-body">
+          <tr><td colspan="5" class="loading"><div class="spinner"></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 角色编辑弹窗 -->
+  <div id="character-modal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="character-modal-title">添加角色</h2>
+        <button class="modal-close" onclick="closeModal('character-modal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="character-form">
+          <input type="hidden" id="character-original-id">
+          <div class="form-row">
+            <div class="form-group">
+              <label>ID（唯一标识）</label>
+              <input type="text" id="character-id" placeholder="例如: ironclad" required>
+            </div>
+            <div class="form-group">
+              <label>排序</label>
+              <input type="number" id="character-sort" placeholder="0" min="0">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>中文名称</label>
+              <input type="text" id="character-name" placeholder="例如: 铁甲战士" required>
+            </div>
+            <div class="form-group">
+              <label>英文名称</label>
+              <input type="text" id="character-name-en" placeholder="例如: Ironclad" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>主色调</label>
+              <div class="color-picker">
+                <input type="color" id="character-color" value="#c0392b">
+                <input type="text" id="character-color-text" value="#c0392b" onchange="updateColorPicker()">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>背景色</label>
+              <div class="color-picker">
+                <input type="color" id="character-bg-color" value="#8b2635">
+                <input type="text" id="character-bg-color-text" value="#8b2635" onchange="updateBgColorPicker()">
+              </div>
+            </div>
+          </div>
+
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeModal('character-modal')">取消</button>
+        <button class="btn btn-primary" onclick="saveCharacter()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 卡牌编辑弹窗 -->
+  <div id="card-modal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="card-modal-title">添加卡牌</h2>
+        <button class="modal-close" onclick="closeModal('card-modal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="card-form">
+          <input type="hidden" id="card-original-id">
+          <div class="form-row">
+            <div class="form-group">
+              <label>ID（唯一标识）</label>
+              <input type="text" id="card-id" placeholder="例如: bash" required>
+            </div>
+            <div class="form-group">
+              <label>所属角色</label>
+              <select id="card-character" required>
+                <option value="">选择角色</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>中文名称</label>
+              <input type="text" id="card-name" placeholder="例如: 痛击" required>
+            </div>
+            <div class="form-group">
+              <label>英文名称</label>
+              <input type="text" id="card-name-en" placeholder="例如: Bash" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>费用</label>
+              <select id="card-cost">
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="-1">X</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>类型</label>
+              <select id="card-type">
+                <option value="攻击">攻击 / Attack</option>
+                <option value="技能">技能 / Skill</option>
+                <option value="能力">能力 / Power</option>
+                <option value="诅咒">诅咒 / Curse</option>
+                <option value="状态">状态 / Status</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>稀有度</label>
+              <select id="card-rarity">
+                <option value="基础">基础 / Basic</option>
+                <option value="普通">普通 / Common</option>
+                <option value="罕见">罕见 / Uncommon</option>
+                <option value="稀有">稀有 / Rare</option>
+                <option value="特殊">特殊 / Special</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>描述</label>
+            <textarea id="card-description" placeholder="卡牌效果描述" required></textarea>
+          </div>
+          <div class="form-group">
+            <label>Meta信息（JSON格式，可选）</label>
+            <textarea id="card-meta" placeholder='{"key": "value"}'></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeModal('card-modal')">取消</button>
+        <button class="btn btn-primary" onclick="saveCard()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 遗物编辑弹窗 -->
+  <div id="relic-modal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="relic-modal-title">添加遗物</h2>
+        <button class="modal-close" onclick="closeModal('relic-modal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="relic-form">
+          <input type="hidden" id="relic-original-id">
+          <div class="form-row">
+            <div class="form-group">
+              <label>ID（唯一标识）</label>
+              <input type="text" id="relic-id" placeholder="例如: burning_blood" required>
+            </div>
+            <div class="form-group">
+              <label>稀有度</label>
+              <select id="relic-rarity">
+                <option value="Starter">初始 / Starter</option>
+                <option value="Common">普通 / Common</option>
+                <option value="Uncommon">罕见 / Uncommon</option>
+                <option value="Rare">稀有 / Rare</option>
+                <option value="Special">特殊 / Special</option>
+                <option value="Boss">Boss</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>中文名称</label>
+              <input type="text" id="relic-name" placeholder="例如: 燃烧之血" required>
+            </div>
+            <div class="form-group">
+              <label>英文名称</label>
+              <input type="text" id="relic-name-en" placeholder="例如: Burning Blood" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>描述</label>
+            <textarea id="relic-description" placeholder="遗物效果描述" required></textarea>
+          </div>
+          <div class="form-group">
+            <label>风味文本（可选）</label>
+            <input type="text" id="relic-flavor" placeholder="遗物的背景描述">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>所属角色（可选）</label>
+              <select id="relic-character">
+                <option value="">无</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>特殊类型</label>
+              <div class="checkbox-group">
+                <label class="checkbox-label">
+                  <input type="checkbox" id="relic-is-boss">
+                  <span>Boss遗物</span>
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" id="relic-is-event">
+                  <span>事件遗物</span>
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" id="relic-is-shop">
+                  <span>商店遗物</span>
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Meta信息（JSON格式，可选）</label>
+            <textarea id="relic-meta" placeholder='{"key": "value"}'></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeModal('relic-modal')">取消</button>
+        <button class="btn btn-primary" onclick="saveRelic()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Buff/Debuff 编辑弹窗 -->
+  <div id="buff-modal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="buff-modal-title">添加Buff/Debuff</h2>
+        <button class="modal-close" onclick="closeModal('buff-modal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="buff-form">
+          <input type="hidden" id="buff-original-id">
+          <div class="form-row">
+            <div class="form-group">
+              <label>ID（唯一标识）</label>
+              <input type="text" id="buff-id" placeholder="例如: strength" required>
+            </div>
+            <div class="form-group">
+              <label>类型</label>
+              <select id="buff-type" required>
+                <option value="shared_buff">共享增益</option>
+                <option value="player_buff">玩家增益</option>
+                <option value="enemy_buff">敌人增益</option>
+                <option value="shared_debuff">共享减益</option>
+                <option value="player_debuff">玩家减益</option>
+                <option value="enemy_debuff">敌人减益</option>
+                <option value="other">其他</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>中文名称</label>
+              <input type="text" id="buff-name" placeholder="例如: 力量" required>
+            </div>
+            <div class="form-group">
+              <label>英文名称</label>
+              <input type="text" id="buff-name-en" placeholder="例如: Strength" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>描述</label>
+            <textarea id="buff-description" placeholder="简短描述效果" required></textarea>
+          </div>
+          <div class="form-group">
+            <label>详细说明</label>
+            <textarea id="buff-details" placeholder="详细机制说明"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="buff-stackable">
+              <span>可叠加</span>
+            </label>
+          </div>
+          <div class="form-group">
+            <label>Meta信息（JSON格式，可选）</label>
+            <textarea id="buff-meta" placeholder='{"key": "value"}'></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeModal('buff-modal')">取消</button>
+        <button class="btn btn-primary" onclick="saveBuff()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 药水编辑弹窗 -->
+  <div id="potion-modal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="potion-modal-title">添加药水</h2>
+        <button class="modal-close" onclick="closeModal('potion-modal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="potion-form">
+          <input type="hidden" id="potion-original-id">
+          <div class="form-group">
+            <label>ID（唯一标识）</label>
+            <input type="text" id="potion-id" placeholder="例如: fire_potion" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>中文名称</label>
+              <input type="text" id="potion-name" placeholder="例如: 火焰药水" required>
+            </div>
+            <div class="form-group">
+              <label>英文名称</label>
+              <input type="text" id="potion-name-en" placeholder="例如: Fire Potion" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>描述</label>
+            <textarea id="potion-description" placeholder="药水效果描述" required></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeModal('potion-modal')">取消</button>
+        <button class="btn btn-primary" onclick="savePotion()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 敌人编辑弹窗 -->
+  <div id="enemy-modal" class="modal-overlay">
+    <div class="modal" style="max-width: 700px;">
+      <div class="modal-header">
+        <h2 id="enemy-modal-title">添加敌人</h2>
+        <button class="modal-close" onclick="closeModal('enemy-modal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="enemy-form">
+          <input type="hidden" id="enemy-original-id">
+          <div class="form-row">
+            <div class="form-group">
+              <label>ID（唯一标识）</label>
+              <input type="text" id="enemy-id" placeholder="例如: cultist" required>
+            </div>
+            <div class="form-group">
+              <label>种类/类别</label>
+              <input type="text" id="enemy-category" placeholder="例如: 第一幕小怪" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>中文名称</label>
+              <input type="text" id="enemy-name" placeholder="例如: 邪教徒" required>
+            </div>
+            <div class="form-group">
+              <label>英文名称</label>
+              <input type="text" id="enemy-name-en" placeholder="例如: Cultist" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>简短描述</label>
+            <input type="text" id="enemy-description" placeholder="敌人的一句话描述">
+          </div>
+          <div class="form-group">
+            <label>详细情况</label>
+            <textarea id="enemy-details" placeholder="敌人的详细机制、行为模式、应对策略等..." style="min-height: 150px;" required></textarea>
+          </div>
+          <div class="form-group">
+            <label>Meta信息（JSON格式，可选）</label>
+            <textarea id="enemy-meta" placeholder='{"key": "value"}'></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeModal('enemy-modal')">取消</button>
+        <button class="btn btn-primary" onclick="saveEnemy()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="notification" class="notification"></div>
+
+  <script>
+
+    // 状态
+    let characters = [];
+    let cards = [];
+    let relics = [];
+
+    // 初始化
+    document.addEventListener('DOMContentLoaded', () => {
+      loadCharacters();
+      loadCards();
+      loadRelics();
+      loadPotions();
+      loadBuffs();
+      loadEnemies();
+    });
+
+    // 切换标签
+    function switchTab(tab) {
+      document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      
+      event.target.classList.add('active');
+      document.getElementById(tab + '-tab').classList.add('active');
+      
+      if (tab === 'cards') loadCards();
+      if (tab === 'relics') loadRelics();
+    }
+
+    // 加载角色
+    async function loadCharacters() {
+      try {
+        const res = await fetch('/api/admin/characters');
+        characters = await res.json();
+        renderCharacters();
+        updateCharacterSelects();
+      } catch (e) {
+        showNotification('加载角色失败: ' + e.message, 'error');
+      }
+    }
+
+    // 渲染角色列表
+    function renderCharacters() {
+      const tbody = document.getElementById('characters-table-body');
+      tbody.innerHTML = characters.map(c => `
+        <tr>
+          <td>${c.sort_order}</td>
+          <td>${c.id}</td>
+          <td>${c.name}</td>
+          <td>${c.name_en}</td>
+          <td>
+            <div class="character-preview">
+              <div class="character-color-box" style="background: ${c.color}"></div>
+              <div class="character-color-box" style="background: ${c.bg_color}"></div>
+            </div>
+          </td>
+          <td>
+            <div class="actions">
+              <button class="btn btn-secondary btn-small" onclick="editCharacter('${c.id}')">编辑</button>
+              <button class="btn btn-danger btn-small" onclick="deleteCharacter('${c.id}')">删除</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // 更新角色下拉框
+    function updateCharacterSelects() {
+      const cardSelect = document.getElementById('card-character');
+      const cardFilter = document.getElementById('card-character-filter');
+      const relicSelect = document.getElementById('relic-character');
+      
+      const options = characters.map(c => 
+        `<option value="${c.id}">${c.name} (${c.name_en})</option>`
+      ).join('');
+      
+      cardSelect.innerHTML = '<option value="">选择角色</option>' + options;
+      cardFilter.innerHTML = '<option value="">所有角色</option>' + options;
+      relicSelect.innerHTML = '<option value="">无</option>' + options;
+    }
+
+    // 加载卡牌
+    async function loadCards() {
+      try {
+        const res = await fetch('/api/admin/cards');
+        const data = await res.json();
+        // 扁平化数据
+        cards = [];
+        for (const [charId, charCards] of Object.entries(data)) {
+          if (!charId) {
+            console.warn('发现 character_id 为空的卡牌:', charCards);
+            continue;
+          }
+          charCards.forEach(c => cards.push({ ...c, character_id: charId }));
+        }
+        renderCards();
+      } catch (e) {
+        showNotification('加载卡牌失败: ' + e.message, 'error');
+      }
+    }
+
+    // 渲染卡牌列表
+    function renderCards(filtered = cards) {
+      const tbody = document.getElementById('cards-table-body');
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><div class="empty-state-icon">🎴</div><p>暂无卡牌</p></td></tr>';
+        return;
+      }
+      
+      tbody.innerHTML = filtered.map(c => {
+        const typeClass = 'badge-' + c.type_en.toLowerCase();
+        const rarityClass = 'badge-' + c.rarity_en.toLowerCase();
+        const costClass = c.cost === 0 ? 'cost-zero' : '';
+        const charName = characters.find(ch => ch.id === c.character_id)?.name || c.character_id;
+        const desc = c.description.length > 40 ? c.description.substring(0, 40) + '...' : c.description;
+        
+        return `
+          <tr>
+            <td><span class="cost-badge ${costClass}">${c.cost === -1 ? 'X' : c.cost}</span></td>
+            <td>${c.name} <small style="color:var(--text-muted)">(${c.name_en})</small></td>
+            <td><span class="badge ${typeClass}">${c.type}</span></td>
+            <td><span class="badge ${rarityClass}">${c.rarity}</span></td>
+            <td>${charName}</td>
+            <td title="${c.description}">${desc}</td>
+            <td>
+              <div class="actions">
+                <button class="btn btn-secondary btn-small" onclick="editCard('${c.id}')">编辑</button>
+                <button class="btn btn-danger btn-small" onclick="deleteCard('${c.id}', '${c.character_id}')">删除</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // 搜索卡牌
+    function searchCards() {
+      const query = document.getElementById('card-search').value.toLowerCase();
+      const charFilter = document.getElementById('card-character-filter').value;
+      
+      let filtered = cards;
+      if (charFilter) {
+        filtered = filtered.filter(c => c.character_id === charFilter);
+      }
+      if (query) {
+        filtered = filtered.filter(c => 
+          c.name.toLowerCase().includes(query) ||
+          c.name_en.toLowerCase().includes(query) ||
+          c.description.toLowerCase().includes(query)
+        );
+      }
+      renderCards(filtered);
+    }
+
+    // 加载遗物
+    async function loadRelics() {
+      try {
+        const res = await fetch('/api/admin/relics');
+        const data = await res.json();
+        // 扁平化数据
+        relics = [];
+        for (const [category, items] of Object.entries(data)) {
+          items.forEach(r => relics.push({ ...r, category }));
+        }
+        renderRelics();
+      } catch (e) {
+        showNotification('加载遗物失败: ' + e.message, 'error');
+      }
+    }
+
+    // 渲染遗物列表
+    function renderRelics(filtered = relics) {
+      const tbody = document.getElementById('relics-table-body');
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><div class="empty-state-icon">🏺</div><p>暂无遗物</p></td></tr>';
+        return;
+      }
+      
+      tbody.innerHTML = filtered.map(r => {
+        const charName = r.character_id ? (characters.find(ch => ch.id === r.character_id)?.name || r.character_id) : '-';
+        const specialType = r.is_boss ? 'Boss' : r.is_event ? '事件' : r.is_shop ? '商店' : '-';
+        const desc = r.description.length > 50 ? r.description.substring(0, 50) + '...' : r.description;
+        
+        return `
+          <tr>
+            <td>${r.name} <small style="color:var(--text-muted)">(${r.name_en})</small></td>
+            <td>${r.rarity}</td>
+            <td>${specialType}</td>
+            <td>${charName}</td>
+            <td title="${r.description}">${desc}</td>
+            <td>
+              <div class="actions">
+                <button class="btn btn-secondary btn-small" onclick="editRelic('${r.id}')">编辑</button>
+                <button class="btn btn-danger btn-small" onclick="deleteRelic('${r.id}')">删除</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // 搜索遗物
+    function searchRelics() {
+      const query = document.getElementById('relic-search').value.toLowerCase();
+      const filtered = query 
+        ? relics.filter(r => 
+            r.name.toLowerCase().includes(query) ||
+            r.name_en.toLowerCase().includes(query) ||
+            r.description.toLowerCase().includes(query)
+          )
+        : relics;
+      renderRelics(filtered);
+    }
+
+    // 弹窗控制
+    function openModal(id) {
+      document.getElementById(id).classList.add('active');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('active');
+    }
+
+    // 颜色选择器同步
+    function updateColorPicker() {
+      document.getElementById('character-color').value = document.getElementById('character-color-text').value;
+    }
+
+    function updateBgColorPicker() {
+      document.getElementById('character-bg-color').value = document.getElementById('character-bg-color-text').value;
+    }
+
+    document.getElementById('character-color')?.addEventListener('input', (e) => {
+      document.getElementById('character-color-text').value = e.target.value;
+    });
+
+    document.getElementById('character-bg-color')?.addEventListener('input', (e) => {
+      document.getElementById('character-bg-color-text').value = e.target.value;
+    });
+
+    // 角色操作
+    function openCharacterModal() {
+      document.getElementById('character-form').reset();
+      document.getElementById('character-original-id').value = '';
+      document.getElementById('character-modal-title').textContent = '添加角色';
+      openModal('character-modal');
+    }
+
+    function editCharacter(id) {
+      const c = characters.find(ch => ch.id === id);
+      if (!c) return;
+      
+      document.getElementById('character-original-id').value = c.id;
+      document.getElementById('character-id').value = c.id;
+      document.getElementById('character-name').value = c.name;
+      document.getElementById('character-name-en').value = c.name_en;
+      document.getElementById('character-color').value = c.color;
+      document.getElementById('character-color-text').value = c.color;
+      document.getElementById('character-bg-color').value = c.bg_color;
+      document.getElementById('character-bg-color-text').value = c.bg_color;
+      document.getElementById('character-sort').value = c.sort_order;
+      document.getElementById('character-modal-title').textContent = '编辑角色';
+      openModal('character-modal');
+    }
+
+    async function saveCharacter() {
+      const originalId = document.getElementById('character-original-id').value;
+      const data = {
+        id: document.getElementById('character-id').value,
+        name: document.getElementById('character-name').value,
+        name_en: document.getElementById('character-name-en').value,
+        color: document.getElementById('character-color').value,
+        bg_color: document.getElementById('character-bg-color').value,
+        sort_order: parseInt(document.getElementById('character-sort').value) || 0
+      };
+
+      try {
+        const url = originalId ? `/api/admin/characters/${originalId}` : '/api/admin/characters';
+        const method = originalId ? 'PUT' : 'POST';
+        
+        const res = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        
+        if (!res.ok) throw new Error(await res.text());
+        
+        showNotification(originalId ? '角色更新成功' : '角色创建成功', 'success');
+        closeModal('character-modal');
+        loadCharacters();
+      } catch (e) {
+        showNotification('保存失败: ' + e.message, 'error');
+      }
+    }
+
+    async function deleteCharacter(id) {
+      if (!confirm('确定要删除这个角色吗？相关的卡牌也会被影响。')) return;
+      
+      try {
+        const res = await fetch(`/api/admin/characters/${id}`, { method: 'DELETE' });
+        if (!res.ok) throw new Error(await res.text());
+        showNotification('角色删除成功', 'success');
+        loadCharacters();
+      } catch (e) {
+        showNotification('删除失败: ' + e.message, 'error');
+      }
+    }
+
+    // 卡牌操作
+    function openCardModal() {
+      document.getElementById('card-form').reset();
+      document.getElementById('card-original-id').value = '';
+      document.getElementById('card-modal-title').textContent = '添加卡牌';
+      openModal('card-modal');
+    }
+
+    function editCard(id) {
+      const c = cards.find(card => card.id === id);
+      if (!c) return;
+      
+      document.getElementById('card-original-id').value = c.id;
+      document.getElementById('card-id').value = c.id;
+      document.getElementById('card-name').value = c.name;
+      document.getElementById('card-name-en').value = c.name_en;
+      document.getElementById('card-character').value = c.character_id;
+      document.getElementById('card-cost').value = c.cost === -1 ? '-1' : c.cost;
+      document.getElementById('card-type').value = c.type;
+      document.getElementById('card-rarity').value = c.rarity;
+      document.getElementById('card-description').value = c.description;
+      document.getElementById('card-meta').value = c.meta_info || '';
+      document.getElementById('card-modal-title').textContent = '编辑卡牌';
+      openModal('card-modal');
+    }
+
+    async function saveCard() {
+      const originalId = document.getElementById('card-original-id').value;
+      const cost = document.getElementById('card-cost').value;
+      const type = document.getElementById('card-type').value;
+      const rarity = document.getElementById('card-rarity').value;
+      
+      const typeMap = { '攻击': 'Attack', '技能': 'Skill', '能力': 'Power', '诅咒': 'Curse', '状态': 'Status' };
+      const rarityMap = { '基础': 'Basic', '普通': 'Common', '罕见': 'Uncommon', '稀有': 'Rare', '特殊': 'Special' };
+      
+      const data = {
+        id: document.getElementById('card-id').value,
+        name: document.getElementById('card-name').value,
+        name_en: document.getElementById('card-name-en').value,
+        character_id: document.getElementById('card-character').value,
+        cost: cost === '-1' ? -1 : parseInt(cost),
+        type: type,
+        type_en: typeMap[type],
+        rarity: rarity,
+        rarity_en: rarityMap[rarity],
+        description: document.getElementById('card-description').value,
+        meta_info: document.getElementById('card-meta').value || null
+      };
+
+      try {
+        const url = originalId ? `/api/admin/cards/${originalId}` : '/api/admin/cards';
+        const method = originalId ? 'PUT' : 'POST';
+        
+        const res = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        
+        if (!res.ok) throw new Error(await res.text());
+        
+        showNotification(originalId ? '卡牌更新成功' : '卡牌创建成功', 'success');
+        closeModal('card-modal');
+        loadCards();
+      } catch (e) {
+        showNotification('保存失败: ' + e.message, 'error');
+      }
+    }
+
+    async function deleteCard(id, characterId) {
+      if (!confirm('确定要删除这张卡牌吗？')) return;
+      
+      if (!characterId) {
+        showNotification('错误：该卡牌缺少角色ID，无法删除', 'error');
+        return;
+      }
+      
+      try {
+        const res = await fetch(`/api/admin/cards/${characterId}/${id}`, { method: 'DELETE' });
+        if (!res.ok) throw new Error(await res.text());
+        showNotification('卡牌删除成功', 'success');
+        loadCards();
+      } catch (e) {
+        showNotification('删除失败: ' + e.message, 'error');
+      }
+    }
+
+
+    // 遗物操作
+    function openRelicModal() {
+      document.getElementById('relic-form').reset();
+      document.getElementById('relic-original-id').value = '';
+      document.getElementById('relic-modal-title').textContent = '添加遗物';
+      openModal('relic-modal');
+    }
+
+    function editRelic(id) {
+      const r = relics.find(relic => relic.id === id);
+      if (!r) return;
+      
+      document.getElementById('relic-original-id').value = r.id;
+      document.getElementById('relic-id').value = r.id;
+      document.getElementById('relic-name').value = r.name;
+      document.getElementById('relic-name-en').value = r.name_en;
+      document.getElementById('relic-rarity').value = r.rarity;
+      document.getElementById('relic-description').value = r.description;
+      document.getElementById('relic-flavor').value = r.flavor || '';
+      document.getElementById('relic-character').value = r.character_id || '';
+      document.getElementById('relic-is-boss').checked = r.is_boss;
+      document.getElementById('relic-is-event').checked = r.is_event;
+      document.getElementById('relic-is-shop').checked = r.is_shop;
+      document.getElementById('relic-meta').value = r.meta_info || '';
+      document.getElementById('relic-modal-title').textContent = '编辑遗物';
+      openModal('relic-modal');
+    }
+
+    async function saveRelic() {
+      const originalId = document.getElementById('relic-original-id').value;
+      const rarity = document.getElementById('relic-rarity').value;
+      
+      const data = {
+        id: document.getElementById('relic-id').value,
+        name: document.getElementById('relic-name').value,
+        name_en: document.getElementById('relic-name-en').value,
+        rarity: rarity,
+        description: document.getElementById('relic-description').value,
+        flavor: document.getElementById('relic-flavor').value,
+        character_id: document.getElementById('relic-character').value || null,
+        is_boss: document.getElementById('relic-is-boss').checked ? 1 : 0,
+        is_event: document.getElementById('relic-is-event').checked ? 1 : 0,
+        is_shop: document.getElementById('relic-is-shop').checked ? 1 : 0,
+        meta_info: document.getElementById('relic-meta').value || null
+      };
+
+      try {
+        const url = originalId ? `/api/admin/relics/${originalId}` : '/api/admin/relics';
+        const method = originalId ? 'PUT' : 'POST';
+        
+        const res = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        
+        if (!res.ok) throw new Error(await res.text());
+        
+        showNotification(originalId ? '遗物更新成功' : '遗物创建成功', 'success');
+        closeModal('relic-modal');
+        loadRelics();
+      } catch (e) {
+        showNotification('保存失败: ' + e.message, 'error');
+      }
+    }
+
+    async function deleteRelic(id) {
+      if (!confirm('确定要删除这个遗物吗？')) return;
+      
+      try {
+        const res = await fetch(`/api/admin/relics/${id}`, { method: 'DELETE' });
+        if (!res.ok) throw new Error(await res.text());
+        showNotification('遗物删除成功', 'success');
+        loadRelics();
+      } catch (e) {
+        showNotification('删除失败: ' + e.message, 'error');
+      }
+    }
+
+    // 从JSON导入
+    async function importFromJson() {
+      if (!confirm('这将从 data/cards.json 和 data/relics.json 导入数据，现有数据将被清空。是否继续？')) return;
+      
+      try {
+        const res = await fetch('/api/admin/import', { method: 'POST' });
+        const result = await res.json();
+        showNotification(`导入成功！卡牌: ${result.cards.count}个, 遗物: ${result.relics.count}个, 药水: ${result.potions?.count || 0}个, Buff: ${result.buffs.count}个, 敌人: ${result.enemies.count}个`, 'success');
+        loadCharacters();
+        loadCards();
+        loadRelics();
+        loadPotions();
+        loadBuffs();
+        loadEnemies();
+      } catch (e) {
+        showNotification('导入失败: ' + e.message, 'error');
+      }
+    }
+
+    // ==================== Potions 操作 ====================
+    
+    let potions = [];
+    
+    async function loadPotions() {
+      try {
+        const res = await fetch('/api/admin/potions');
+        potions = await res.json();
+        renderPotions();
+      } catch (e) {
+        showNotification('加载药水失败: ' + e.message, 'error');
+      }
+    }
+    
+    function renderPotions(filtered = potions) {
+      const tbody = document.getElementById('potions-table-body');
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="empty-state"><div class="empty-state-icon">🧪</div><p>暂无药水数据</p></td></tr>';
+        return;
+      }
+      
+      tbody.innerHTML = filtered.map(p => {
+        const desc = p.description.length > 50 ? p.description.substring(0, 50) + '...' : p.description;
+        return `
+          <tr>
+            <td><code>${p.id}</code></td>
+            <td>${p.name} <small style="color:var(--text-muted)">(${p.name_en})</small></td>
+            <td>${desc}</td>
+            <td>
+              <div class="actions">
+                <button class="btn btn-small btn-secondary" onclick="editPotion('${p.id}')">编辑</button>
+                <button class="btn btn-small btn-danger" onclick="deletePotion('${p.id}')">删除</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+    
+    function searchPotions() {
+      const query = document.getElementById('potion-search').value.toLowerCase();
+      const filtered = potions.filter(p => 
+        p.id.toLowerCase().includes(query) ||
+        p.name.toLowerCase().includes(query) ||
+        p.name_en.toLowerCase().includes(query) ||
+        p.description.toLowerCase().includes(query)
+      );
+      renderPotions(filtered);
+    }
+    
+    function openPotionModal(potion = null) {
+      document.getElementById('potion-form').reset();
+      document.getElementById('potion-original-id').value = '';
+      
+      if (potion) {
+        document.getElementById('potion-modal-title').textContent = '编辑药水';
+        document.getElementById('potion-original-id').value = potion.id;
+        document.getElementById('potion-id').value = potion.id;
+        document.getElementById('potion-name').value = potion.name;
+        document.getElementById('potion-name-en').value = potion.name_en;
+        document.getElementById('potion-description').value = potion.description;
+        document.getElementById('potion-id').disabled = true;
+      } else {
+        document.getElementById('potion-modal-title').textContent = '添加药水';
+        document.getElementById('potion-id').disabled = false;
+      }
+      
+      openModal('potion-modal');
+    }
+    
+    async function savePotion() {
+      const form = document.getElementById('potion-form');
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+      
+      const originalId = document.getElementById('potion-original-id').value;
+      const data = {
+        id: document.getElementById('potion-id').value,
+        name: document.getElementById('potion-name').value,
+        name_en: document.getElementById('potion-name-en').value,
+        description: document.getElementById('potion-description').value
+      };
+      
+      try {
+        const url = originalId ? `/api/admin/potions/${originalId}` : '/api/admin/potions';
+        const method = originalId ? 'PUT' : 'POST';
+        
+        const res = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        
+        if (!res.ok) throw new Error(await res.text());
+        
+        showNotification(originalId ? '药水更新成功' : '药水添加成功', 'success');
+        closeModal('potion-modal');
+        loadPotions();
+      } catch (e) {
+        showNotification('保存失败: ' + e.message, 'error');
+      }
+    }
+    
+    function editPotion(id) {
+      const potion = potions.find(p => p.id === id);
+      if (potion) openPotionModal(potion);
+    }
+    
+    async function deletePotion(id) {
+      if (!confirm('确定要删除这个药水吗？')) return;
+      
+      try {
+        const res = await fetch(`/api/admin/potions/${id}`, { method: 'DELETE' });
+        if (!res.ok) throw new Error(await res.text());
+        showNotification('药水删除成功', 'success');
+        loadPotions();
+      } catch (e) {
+        showNotification('删除失败: ' + e.message, 'error');
+      }
+    }
+
+    // ==================== Buffs 操作 ====================
+    
+    let buffs = [];
+    
+    async function loadBuffs() {
+      try {
+        const res = await fetch('/api/admin/buffs');
+        const data = await res.json();
+        // 扁平化数据
+        buffs = [];
+        for (const [type, items] of Object.entries(data)) {
+          items.forEach(b => buffs.push({ ...b, type_key: type }));
+        }
+        renderBuffs();
+      } catch (e) {
+        showNotification('加载Buff失败: ' + e.message, 'error');
+      }
+    }
+    
+    function renderBuffs(filtered = buffs) {
+      const tbody = document.getElementById('buffs-table-body');
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><div class="empty-state-icon">⚡</div><p>暂无Buff/Debuff数据</p></td></tr>';
+        return;
+      }
+      
+      tbody.innerHTML = filtered.map(b => {
+        const typeLabels = { 
+          shared_buff: '共享增益', 
+          player_buff: '玩家增益', 
+          enemy_buff: '敌人增益', 
+          shared_debuff: '共享减益', 
+          player_debuff: '玩家减益', 
+          enemy_debuff: '敌人减益', 
+          other: '其他' 
+        };
+        const details = b.details && b.details.length > 60 ? b.details.substring(0, 60) + '...' : (b.details || b.description || '-');
+        const stackableMark = b.stackable === 1 || b.stackable === true ? '✓' : '';
+        
+        return `
+          <tr>
+            <td>${b.name} <small style="color:var(--text-muted)">(${b.name_en})</small></td>
+            <td><span class="badge badge-${b.type}">${typeLabels[b.type] || b.type}</span></td>
+            <td style="text-align:center">${stackableMark}</td>
+            <td title="${b.details || b.description || ''}">${details}</td>
+            <td>
+              <div class="actions">
+                <button class="btn btn-secondary btn-small" onclick="editBuff('${b.id}')">编辑</button>
+                <button class="btn btn-danger btn-small" onclick="deleteBuff('${b.id}')">删除</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+    
+    function searchBuffs() {
+      const query = document.getElementById('buff-search').value.toLowerCase();
+      const typeFilter = document.getElementById('buff-type-filter').value;
+      
+      let filtered = buffs;
+      if (typeFilter) {
+        filtered = filtered.filter(b => b.type === typeFilter);
+      }
+      if (query) {
+        filtered = filtered.filter(b => 
+          b.name.toLowerCase().includes(query) ||
+          b.name_en.toLowerCase().includes(query) ||
+          b.description.toLowerCase().includes(query)
+        );
+      }
+      renderBuffs(filtered);
+    }
+    
+    function openBuffModal() {
+      document.getElementById('buff-form').reset();
+      document.getElementById('buff-original-id').value = '';
+      document.getElementById('buff-modal-title').textContent = '添加Buff/Debuff';
+      openModal('buff-modal');
+    }
+    
+    function editBuff(id) {
+      const b = buffs.find(buff => buff.id === id);
+      if (!b) return;
+      
+      document.getElementById('buff-original-id').value = b.id;
+      document.getElementById('buff-id').value = b.id;
+      document.getElementById('buff-name').value = b.name;
+      document.getElementById('buff-name-en').value = b.name_en;
+      document.getElementById('buff-type').value = b.type;
+      document.getElementById('buff-description').value = b.description;
+      document.getElementById('buff-details').value = b.details || '';
+      document.getElementById('buff-stackable').checked = b.stackable === 1;
+      document.getElementById('buff-meta').value = b.meta_info || '';
+      document.getElementById('buff-modal-title').textContent = '编辑Buff/Debuff';
+      openModal('buff-modal');
+    }
+    
+    async function saveBuff() {
+      const originalId = document.getElementById('buff-original-id').value;
+      const data = {
+        id: document.getElementById('buff-id').value,
+        name: document.getElementById('buff-name').value,
+        name_en: document.getElementById('buff-name-en').value,
+        type: document.getElementById('buff-type').value,
+        description: document.getElementById('buff-description').value,
+        details: document.getElementById('buff-details').value,
+        stackable: document.getElementById('buff-stackable').checked ? 1 : 0,
+        meta_info: document.getElementById('buff-meta').value || null
+      };
+
+      try {
+        const url = originalId ? `/api/admin/buffs/${originalId}` : '/api/admin/buffs';
+        const method = originalId ? 'PUT' : 'POST';
+        
+        const res = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        
+        if (!res.ok) throw new Error(await res.text());
+        
+        showNotification(originalId ? 'Buff更新成功' : 'Buff创建成功', 'success');
+        closeModal('buff-modal');
+        loadBuffs();
+      } catch (e) {
+        showNotification('保存失败: ' + e.message, 'error');
+      }
+    }
+    
+    async function deleteBuff(id) {
+      if (!confirm('确定要删除这个Buff/Debuff吗？')) return;
+      
+      try {
+        const res = await fetch(`/api/admin/buffs/${id}`, { method: 'DELETE' });
+        if (!res.ok) throw new Error(await res.text());
+        showNotification('Buff删除成功', 'success');
+        loadBuffs();
+      } catch (e) {
+        showNotification('删除失败: ' + e.message, 'error');
+      }
+    }
+    
+    // ==================== Enemies 操作 ====================
+    
+    let enemies = [];
+    let enemyCategories = [];
+    
+    async function loadEnemies() {
+      try {
+        const res = await fetch('/api/admin/enemies');
+        const data = await res.json();
+        // 扁平化数据
+        enemies = [];
+        enemyCategories = Object.keys(data);
+        updateEnemyCategoryFilter();
+        for (const [category, items] of Object.entries(data)) {
+          items.forEach(e => enemies.push({ ...e, category }));
+        }
+        renderEnemies();
+      } catch (e) {
+        showNotification('加载敌人失败: ' + e.message, 'error');
+      }
+    }
+    
+    function updateEnemyCategoryFilter() {
+      const select = document.getElementById('enemy-category-filter');
+      const options = enemyCategories.map(c => `<option value="${c}">${c}</option>`).join('');
+      select.innerHTML = '<option value="">所有种类</option>' + options;
+    }
+    
+    function renderEnemies(filtered = enemies) {
+      const tbody = document.getElementById('enemies-table-body');
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><div class="empty-state-icon">👹</div><p>暂无敌人数据</p></td></tr>';
+        return;
+      }
+      
+      tbody.innerHTML = filtered.map(e => {
+        const desc = e.description && e.description.length > 30 ? e.description.substring(0, 30) + '...' : (e.description || '-');
+        const detailsPreview = e.details.length > 50 ? e.details.substring(0, 50) + '...' : e.details;
+        
+        return `
+          <tr>
+            <td>${e.name} <small style="color:var(--text-muted)">(${e.name_en})</small></td>
+            <td>${e.category}</td>
+            <td title="${e.description || ''}">${desc}</td>
+            <td title="${e.details}">${detailsPreview}</td>
+            <td>
+              <div class="actions">
+                <button class="btn btn-secondary btn-small" onclick="editEnemy('${e.id}')">编辑</button>
+                <button class="btn btn-danger btn-small" onclick="deleteEnemy('${e.id}')">删除</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+    
+    function searchEnemies() {
+      const query = document.getElementById('enemy-search').value.toLowerCase();
+      const categoryFilter = document.getElementById('enemy-category-filter').value;
+      
+      let filtered = enemies;
+      if (categoryFilter) {
+        filtered = filtered.filter(e => e.category === categoryFilter);
+      }
+      if (query) {
+        filtered = filtered.filter(e => 
+          e.name.toLowerCase().includes(query) ||
+          e.name_en.toLowerCase().includes(query) ||
+          e.description.toLowerCase().includes(query) ||
+          e.details.toLowerCase().includes(query)
+        );
+      }
+      renderEnemies(filtered);
+    }
+    
+    function openEnemyModal() {
+      document.getElementById('enemy-form').reset();
+      document.getElementById('enemy-original-id').value = '';
+      document.getElementById('enemy-modal-title').textContent = '添加敌人';
+      openModal('enemy-modal');
+    }
+    
+    function editEnemy(id) {
+      const e = enemies.find(enemy => enemy.id === id);
+      if (!e) return;
+      
+      document.getElementById('enemy-original-id').value = e.id;
+      document.getElementById('enemy-id').value = e.id;
+      document.getElementById('enemy-name').value = e.name;
+      document.getElementById('enemy-name-en').value = e.name_en;
+      document.getElementById('enemy-category').value = e.category;
+      document.getElementById('enemy-description').value = e.description || '';
+      document.getElementById('enemy-details').value = e.details;
+      document.getElementById('enemy-meta').value = e.meta_info || '';
+      document.getElementById('enemy-modal-title').textContent = '编辑敌人';
+      openModal('enemy-modal');
+    }
+    
+    async function saveEnemy() {
+      const originalId = document.getElementById('enemy-original-id').value;
+      const data = {
+        id: document.getElementById('enemy-id').value,
+        name: document.getElementById('enemy-name').value,
+        name_en: document.getElementById('enemy-name-en').value,
+        category: document.getElementById('enemy-category').value,
+        description: document.getElementById('enemy-description').value,
+        details: document.getElementById('enemy-details').value,
+        meta_info: document.getElementById('enemy-meta').value || null
+      };
+
+      try {
+        const url = originalId ? `/api/admin/enemies/${originalId}` : '/api/admin/enemies';
+        const method = originalId ? 'PUT' : 'POST';
+        
+        const res = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        
+        if (!res.ok) throw new Error(await res.text());
+        
+        showNotification(originalId ? '敌人更新成功' : '敌人创建成功', 'success');
+        closeModal('enemy-modal');
+        loadEnemies();
+      } catch (e) {
+        showNotification('保存失败: ' + e.message, 'error');
+      }
+    }
+    
+    async function deleteEnemy(id) {
+      if (!confirm('确定要删除这个敌人吗？')) return;
+      
+      try {
+        const res = await fetch(`/api/admin/enemies/${id}`, { method: 'DELETE' });
+        if (!res.ok) throw new Error(await res.text());
+        showNotification('敌人删除成功', 'success');
+        loadEnemies();
+      } catch (e) {
+        showNotification('删除失败: ' + e.message, 'error');
+      }
+    }
+
+    // 通知
+    function showNotification(message, type) {
+      const notif = document.getElementById('notification');
+      notif.textContent = message;
+      notif.className = `notification ${type} show`;
+      setTimeout(() => notif.classList.remove('show'), 3000);
+    }
+
+    // 点击遮罩关闭弹窗
+    document.querySelectorAll('.modal-overlay').forEach(modal => {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal(modal.id);
+      });
+    });
+  </script>
+</body>
+</html>

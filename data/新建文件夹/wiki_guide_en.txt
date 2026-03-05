@@ -1,0 +1,458 @@
+# Slay the Spire Basic Rules Research Report
+
+## 1. Core Card Pile System Mechanics
+
+### 1.1 Definitions of the Four Card Zones
+
+#### 1.1.1 Draw Pile
+
+The Draw Pile is the starting point and resource reservoir of Slay the Spire's card cycling system, with its formation mechanism having clear randomness characteristics. **At the beginning of each combat, all cards in the player's deck are randomly shuffled by the system to form the initial Draw Pile**. This randomization ensures combat unpredictability—the same deck may present vastly different card orders in different battles.
+
+The Draw Pile's interface presentation contains two levels of information: a number indicator showing the current remaining card count, and a click operation that expands to view all specific cards within the Draw Pile. However, there is a key limitation to information acquisition—**without the specific relic "Frozen Eye," the system only displays card composition, not revealing the actual draw order**. This means players know "what cards" they have, but not "when they'll draw them." This information asymmetry constitutes an important source of the game's core randomness. The "Frozen Eye" relic fundamentally changes this mechanism, making the Draw Pile display in actual draw order, providing advanced players with precise card sequencing control capabilities—a key tool for building complex loop combos.
+
+The Draw Pile's dynamic changes follow strict mathematical rules. As players draw cards each turn, its count continuously decreases; when the count reaches zero and the system needs to continue drawing, the shuffle mechanism is automatically triggered. This design ensures the infinite sustainability of card resources, completely abandoning the "fatigue" penalty mechanism common in traditional card games, allowing players to focus on strategy execution rather than resource anxiety.
+
+#### 1.1.2 Hand
+
+The Hand is the collection of cards the player can directly operate with in the current turn, representing immediate tactical choice space. Slay the Spire sets a **hard cap on hand size—maximum 10 cards**. This limiting mechanism has mandatory consequences: **when the hand reaches 10 cards, all draw effects completely fail**, regardless of whether their source is card effects, relic triggers, or other special mechanisms.
+
+The hand limit design creates rich strategic tension. Players need to dynamically balance between "accumulating cards to retain choice space" and "clearing space to trigger draw effects." Excessive accumulation may lead to wasting key draw opportunities, while excessive consumption may expose the player to enemy attack threats. This is particularly important when facing enemies or cards with forced draw effects—certain "forced draw" negative effects from enemies become substantial punishments when the hand is full.
+
+The turn-binding characteristic of the hand is another core attribute. **At the end of the turn, all unplayed hand cards are forced into the Discard Pile**, a rule that completely eliminates the possibility of cross-turn hand retention. Each turn's hand state is independent and transient—this "live in the moment" design reinforces Slay the Spire's tactical urgency, requiring players to make optimal decisions based on current resources every turn. Specific attributes like "Retain" can break this limitation, but they are exceptions rather than the norm.
+
+#### 1.1.3 Discard Pile
+
+The Discard Pile is a crucial transfer station in the card cycling system,承担卡牌回收与再利用的功能。其接收范围涵盖三类卡牌：**玩家主动打出的卡牌、被特定效果强制抛弃的卡牌、以及回合结束时未使用的手牌** 。这一宽泛的接收范围确保了绝大多数卡牌都能在战斗过程中保持流动性。
+
+弃牌堆与抽牌堆的联动关系构成了卡牌循环的核心机制。**当抽牌堆的剩余卡牌数量降为零，且系统需要继续执行抽牌操作时，弃牌堆中的所有卡牌将被充分洗匀，然后整体转移至抽牌堆** 。这一洗牌过程具有两个关键特征：随机性（消除原有顺序信息）和完整性（弃牌堆所有卡牌均进入新循环，被消耗的卡牌除外）。洗牌的时机控制蕴含着高级策略空间——玩家可以通过管理抽牌堆和弃牌堆的卡牌数量，影响洗牌发生的时机，从而间接影响关键卡牌的抽取概率。
+
+弃牌堆的状态管理在特定构建中具有战略价值。某些卡牌和遗物的效果直接与弃牌堆互动，例如将弃牌堆中的特定卡牌移回手牌或抽牌堆顶部，这些机制为牌序控制提供了额外的操作空间。同时，弃牌堆的卡牌构成也反映了玩家本回合及之前回合的决策轨迹，成为评估战斗状态和预测未来牌序的重要依据。
+
+#### 1.1.4 Exhaust Pile
+
+The Exhaust Pile is the most special zone in Slay the Spire's card system, representing permanent loss of card resources (within the single combat dimension). **When a card is "Exhausted," it is removed from all conventional card cycles and enters the Exhaust Pile directly, becoming unavailable again until the end of the current combat**.
+
+The trigger pathways for the Exhaust mechanism are diverse:
+
+| Trigger Method | Specific Description | Typical Application Scenario |
+|---------------|---------------------|------------------------------|
+| Card's Own Exhaust | Playing a card with the "Exhaust" keyword | Powerful one-time effects |
+| External Effect Forced Exhaust | Specific card effects consuming other cards | Deck thinning, negative card removal |
+| Ethereal Attribute Trigger | Cards with "Ethereal" attribute not played by turn end | Time-limited card management |
+
+The independence of the Exhaust Pile is its core characteristic. Unlike the Discard Pile, **cards in the Exhaust Pile will never automatically return to the Draw Pile or Hand under any circumstances**. They are permanently isolated from the combat system, only returning to the player's deck when combat ends. This design creates a clear resource stratification: conventional cards (Draw Pile → Hand → Discard Pile) constitute a recyclable basic resource pool, while exhausted cards represent single-use strategic resources.
+
+The strategic value of the Exhaust mechanism manifests in multiple dimensions. First, it provides a balance mechanism for powerful effects—strength beyond conventional cards comes at the cost of single use. Second, it creates "deck thinning" strategic space, improving the cycling efficiency of key cards by exhausting low-value cards. Third, it has deep synergy with specific builds—certain cards and relics transform the exhaust behavior itself into a source of profit.
+
+### 1.2 Card Cycling Flow
+
+#### 1.2.1 Standard Draw Rules
+
+Slay the Spire's draw mechanism follows clear and stable baseline rules. **At the beginning of each turn, the player draws 5 cards from the Draw Pile to the Hand**. This value is a core constant of game design, forming the calculation basis for all draw-related strategies. The 5-card draw amount is carefully tuned: it ensures players have sufficient choice space each turn while avoiding decision paralysis caused by excessive hand size.
+
+Standard draw rules have multiple modification pathways. Relic effects are a common source of draw amount adjustments—for example, the Silent's starting relic "Ring of the Snake" causes the player to draw 2 additional cards in the first turn of combat, a design that reinforces the Silent's quick-start characteristics. Card effects can also change draw amounts—numerous Skill and Attack cards carry "Draw X cards" effect descriptions, which draw the specified number of cards from the Draw Pile when executed.
+
+The execution rules of draw operations contain key details. When the Draw Pile's card count is insufficient to meet draw demands, the system will first draw the remaining cards from the Draw Pile, then trigger the shuffle mechanism, and continue drawing the deficit from the newly formed Draw Pile. This "phased draw" rule ensures complete fulfillment of draw demands while creating predictable shuffle timing.
+
+#### 1.2.2 Shuffle Trigger Conditions
+
+Shuffling is a critical node in Slay the Spire's card cycling, marking the reactivation of Discard Pile resources. **The trigger condition for shuffling has a clear mathematical definition: when the Draw Pile's remaining card count reaches zero, and the system needs to continue executing draw operations**, the shuffle mechanism automatically activates.
+
+The shuffle execution process contains two core steps: randomization (all cards in the Discard Pile are thoroughly shuffled, eliminating original order information) and transfer (the shuffled cards are moved into the Draw Pile as a whole). The randomness of this process is its core characteristic, but there is also operable strategic space—by controlling the order in which cards enter the Discard Pile (i.e., the order in which cards are played), players can indirectly influence the post-shuffle card order distribution. This mechanism is the theoretical foundation of advanced card sequencing control techniques.
+
+Shuffle timing control contains rich strategic dimensions. Players can influence when shuffling occurs by precisely managing the number of cards in the Draw Pile and Discard Pile: retaining a small number of cards in the Draw Pile can delay shuffling, ensuring specific cards are drawn at critical moments; actively accelerating Draw Pile consumption can advance shuffling, allowing key cards in the Discard Pile to return to drawable status as soon as possible.
+
+#### 1.2.3 No Fatigue Mechanism
+
+Slay the Spire's card cycling design fundamentally abandons the "fatigue" penalty mechanism common in traditional card games. In games like Hearthstone, when a player's deck is exhausted and they continue to draw, they suffer increasing health damage; **in Slay the Spire, card resource exhaustion only triggers automatic shuffling, without any negative consequences**.
+
+The design philosophy of the no-fatigue mechanism reflects Slay the Spire's core gameplay orientation: **encouraging active card cycling and resource utilization rather than passive resource hoarding**. Players don't need to worry about the risk of "drawing out the deck" and can boldly execute high-draw strategies. This design also aligns with the game's roguelike characteristics—in a high-pressure permanent death environment, additional penalty mechanisms would excessively increase player anxiety and harm playability.
+
+The no-fatigue mechanism doesn't mean card resources are infinite. Although drawing itself is unrestricted, actual card use is constrained by the energy system—the limited energy points each turn determine the upper limit of playable cards. Therefore, Slay the Spire's resource management core shifts from "card quantity management" to "energy-card efficiency management," a shift that forms the foundation of the game's unique strategic depth.
+
+## 2. Energy System
+
+### 2.1 Basic Energy Rules
+
+#### 2.1.1 Energy Acquisition and Reset
+
+Energy is the core resource driving card use in Slay the Spire, with its management mechanism following strict turn-based rules. **At the beginning of each turn, the player's energy value automatically refills to the baseline value**. This reset mechanism is mandatory and unconditional—regardless of how much energy remained last turn, it will uniformly reset to a fixed value at the start of a new turn.
+
+The game's initial energy baseline value is **3 points**. This value is carefully balanced: 3 energy is sufficient to support the combined use of most basic cards (e.g., 1 two-cost card + 1 one-cost card, or 3 one-cost cards), while setting a reasonable threshold for using high-cost powerful cards. The 3-energy design creates rich early-game decision space, requiring players to carefully plan energy allocation schemes each turn.
+
+The absoluteness of energy reset is its key characteristic. **Unused energy does not carry over to the next turn**—this "no retention" rule completely eliminates energy hoarding strategies, forcing players to utilize available resources as fully as possible each turn. This design reinforces Slay the Spire's "turn autonomy" tactical philosophy—each turn is an independent decision unit, and decisions from past turns do not provide direct resource dividends for new turns.
+
+#### 2.1.2 Energy Consumption and Limitations
+
+Energy use follows clear priority and constraint rules. **The use of the vast majority of cards requires consuming a specific amount of energy—the number in the upper left corner of the card represents its energy consumption requirement**. Energy consumption is a necessary condition for card use—when the player has insufficient energy, the corresponding card cannot be played, and the system provides visual feedback (such as the card darkening) to indicate the current state to the player.
+
+The numerical distribution of energy consumption shows obvious regularity. Basic card energy consumption typically concentrates in the 0-3 point range, with 1-cost cards forming the most numerous middle layer, 0-cost cards providing cost-free operation options, and 2-3 cost cards carrying more powerful effects. This distribution ensures the smooth operation of the energy system—players rarely face extreme situations of severe energy excess or deficiency.
+
+The constraint boundaries of the energy system have asymmetric characteristics: **the energy minimum is zero, with no concept of negative energy**; meanwhile, **energy has no upper limit**—although initial energy per turn is fixed, additional energy obtained through card and relic effects can stack infinitely, providing the theoretical basis for explosive turns and infinite combos.
+
+### 2.2 Energy-Related Special Mechanics
+
+#### 2.2.1 Card Energy Indicators
+
+Slay the Spire's card energy indicator system has fine semantic layering:
+
+| Indicator Type | Presentation Form | Mechanic Meaning |
+|---------------|-------------------|------------------|
+| Numeric Indicator | Arabic numeral in upper left corner (0-3 common) | Energy points required to use this card |
+| "X" Indicator | Capital letter X | Expends all existing energy; effect scales with energy consumed |
+| No Indicator | Blank | This card cannot be actively played |
+
+Cards with numeric indicators constitute the main body of the game, with a rough correspondence between their energy consumption and effect strength. The "X" indicator represents a special energy consumption mode—**cards with X indicators will expend all of the player's current energy when used**, with effect strength proportional to the amount of energy consumed. For example, an X-cost attack card might deal "X damage" or "X attacks" effect. The use of X-indicator cards requires precise energy calculation—using too early may waste energy, while using too late may miss the optimal window.
+
+Cards with no energy indicator constitute a special category. These cards **cannot be actively played**—their existence and effects are triggered through other mechanisms. For example, certain cards have "when discarded from hand, trigger effect" descriptions; the design intent of such cards is not active use but as coordination components for other card effects.
+
+#### 2.2.2 External Energy Effects
+
+The relic system is the main source of external energy influence. **Numerous relics provide fixed energy gains per turn**—for example, "Mark of Pain," "Philosopher's Stone," "Runic Dome," etc., all provide 1 additional energy to the player at the beginning of each turn.
+
+Energy gain relics generally adopt a "cost-benefit" design structure:
+
+| Relic Name | Energy Gain | Negative Cost | Strategic Impact |
+|-----------|-------------|---------------|------------------|
+| Mark of Pain | +1 energy per turn | Places 2 Wounds in Draw Pile at combat start | Deck pollution, requires managing status cards |
+| Philosopher's Stone | +1 energy per turn | All enemies start with 1 Strength | Global difficulty increase, requires accelerated killing |
+| Runic Dome | +1 energy per turn | Cannot see enemy intents | Information deficiency, relies on probability defense |
+| Sozu | +1 energy per turn | Can no longer obtain potions | Resource channel reduction, requires adjusting consumption strategy |
+| Ectoplasm | +1 energy per turn | Can no longer gain any gold | Economic development limited, store purchasing power decreased |
+| Velvet Choker | +1 energy per turn | Cannot play more than 6 cards per turn | Limits card draw strategies, requires streamlined operations |
+| Busted Crown | +1 energy per turn | Card reward choices reduced by 2 | Deck building restricted, quality screening difficult |
+| Fusion Hammer | +1 energy per turn | Cannot forge upgrade cards at Rest Sites | Growth channel limited, relies on initial quality |
+| Coffee Dripper | +1 energy per turn | Cannot rest at Rest Sites | Health management pressure increased |
+| Slaver's Collar | +1 energy per turn in Boss and Elite combats | Limited scene effectiveness | Specific combat enhancement, no benefit in regular combat |
+
+This design structure requires players to conduct fine risk assessment: Is the tactical value of energy gain sufficient to offset the strategic cost of negative consequences? The answer to this trade-off may vary greatly depending on character, deck build, and game stage.
+
+## 3. Card Type System
+
+### 3.1 Core Card Types
+
+#### 3.1.1 Attack Cards
+
+Attack cards are the most direct damage output means in Slay the Spire, with clear and explicit functional definitions: **dealing direct damage to enemies**. Attack cards follow the standard process: played from hand, consume specified energy, deal damage to selected targets (single enemy or all enemies), then enter the Discard Pile.
+
+Attack card damage calculation involves multi-layer correction factors. The base damage value is determined by the card itself, then affected by Strength, Weak, Vulnerable, and other statuses, forming the actual damage output. Certain attack cards have special damage calculation rules—for example, "Heavy Blade" multiplies Strength bonus by 3 (5 after upgrade), a design that creates excess return scenarios for the Strength attribute.
+
+The tactical value of attack cards extends beyond damage values. **Numerous attack cards carry additional effect components**: applying negative statuses, generating Block, drawing cards, exhausting other cards, etc. These composite effects significantly expand the functional boundaries of attack cards, blurring the distinction between "attack" and "skill" on certain cards. For example, "Iron Wave" simultaneously provides Block and damage,兼具攻防双重功能。
+
+#### 3.1.2 Skill Cards
+
+技能牌是杀戮尖塔中功能最为多元的卡牌类型，承载着非攻击效果的全部谱系 。技能牌的设计空间极为广阔：格挡获取、抽牌、能量补充、状态施加、卡牌操控、治疗……几乎所有非直接伤害的效果都可以归入技能牌的范畴。
+
+格挡和抽牌是技能牌的两大核心功能类别。**Numerous技能牌提供"获得X点格挡"的效果**，构成玩家防御体系的基础；同样，numerous技能牌具有"抽X张牌"的效果，是维持手牌流动性和战术选择空间的关键。这两类功能的组合与平衡，是卡组构建的核心考量之一。
+
+技能牌的能量消耗分布呈现明显的偏态特征。由于技能牌往往承载复杂的多组件效果，其能量消耗普遍高于攻击牌。2费技能牌构成常见的高价值选项，3费技能牌则代表战略级别的强力效果。高费技能牌的使用需要精确的时机判断——过早使用可能导致能量分配失衡，过晚使用则可能错失关键窗口。
+
+#### 3.1.3 Power Cards
+
+Power cards are the most mechanically special card type in Slay the Spire, with effect patterns fundamentally different from Attack and Skill cards. **The core characteristic of Power cards is persistent effects: once played, their effects remain permanently active for the remainder of the combat, without needing to be replayed**.
+
+The destination of Power cards after use is another key characteristic. Unlike Attack and Skill cards that enter the Discard Pile, **Power cards permanently disappear after use, no longer appearing in any card pile** (not included in Draw Pile, Hand, Discard Pile, or Exhaust Pile). This mechanism means Power cards are strictly single-use per combat and cannot be recovered or reused through any conventional means.
+
+The persistent effects of Power cards cover a wide range of mechanic types: attribute gains (such as fixed Block, energy, or card draw per turn), status triggers (such as automatic effect triggers under specific conditions), resource conversion (such as automatic transformation of one resource type into another), etc. The common characteristic of these effects is automation and persistence—once established, they automatically take effect at each relevant timing without requiring active player operation.
+
+The strategic value assessment of Power cards requires a long-term perspective. Although Power cards usually have high energy costs (2-3 cost common) and delayed effects (usually no immediate benefit in the current turn), their cross-turn cumulative benefits often far exceed single-use Attack or Skill cards. Therefore, **the timing of playing Power cards becomes a critical decision**: playing too early may cause defense gaps due to energy occupation; playing too late may lose multi-turn cumulative benefits.
+
+### 3.2 Disruptive Card Types
+
+#### 3.2.1 Status Cards
+
+Status cards are specially designed disruptive cards in Slay the Spire, with their core function being to destroy the efficiency of the player's deck operation. Unlike cards actively acquired by players, status cards mainly come from enemy attack effects or negative costs of specific cards, possessing compulsory and unpredictable characteristics.
+
+The common characteristic of status cards is **cannot be played**—they occupy hand space, consume draw resources, but cannot produce any positive effects. This "occupying space without working" characteristic makes status cards purely negative existences, and their accumulation will seriously compress the player's effective operation space.
+
+The game currently defines five standard status cards, each with unique disruption mechanisms:
+
+| Status Card Name | Core Mechanic | Additional Effect | Management Strategy |
+|-----------------|---------------|-------------------|---------------------|
+| Wound | Cannot be played | None | Quickly cycle into Discard Pile |
+| Dazed | Cannot be played | **Ethereal** (exhausted if not played by turn end) | Utilize Ethereal for automatic removal, or actively discard |
+| Burn | Cannot be played | At player turn end, if in hand, deals 2 damage to player | Prioritize playing or exhausting, avoid sustained damage |
+| Void | Cannot be played | **Ethereal**; when drawn, player loses 1 energy | Avoid drawing, or utilize Ethereal for quick removal |
+| Slimed | Cannot be played | **Exhaust** (enters Exhaust Pile after being played) | Can be actively removed through exhaust mechanism |
+
+The differentiated design of status cards creates rich response strategy space. Wounds, as the most basic status card, only have occupying effects and are relatively easy to manage; Dazed and Void's "Ethereal" attribute provides automatic removal pathways but may trigger unwanted exhaust effects; Burn's sustained damage threat requires priority handling; Slimed's "Exhaust" attribute creates special interaction possibilities—although it cannot be directly played, it can be actively removed through cards with "exhaust card" effects, or even transformed into a source of profit.
+
+The temporary nature of status cards is a key characteristic. **Unlike Curse cards, status cards only exist during combat and are automatically removed from the deck after combat ends**. This design limits the long-term negative impact of status cards, making them manageable tactical challenges rather than strategic burdens.
+
+#### 3.2.2 Curse Cards
+
+Curse cards are the most persistently negative card type in Slay the Spire, existing throughout the entire adventure process until removed by specific means. In stark contrast to the temporary nature of status cards, **once obtained, curse cards permanently exist in the deck**, participating in the card cycle of every combat and continuously exerting negative effects.
+
+Curse card sources are diverse: consequences of random event choices, negative effects of specific relics, "discount" costs of store purchases, etc. The acquisition of curse cards is often the result of player active decisions—to obtain some immediate benefit (such as gold, relics, cards), players may be forced to accept the long-term burden of curse cards. This "short-term gain, long-term cost" tradeoff structure is one of the core sources of Slay the Spire's decision depth.
+
+Curse card negative effects cover a wide range of mechanic types: cannot be played (similar to status cards), energy penalties, health loss, hand restrictions, draw interference, etc. Different curse cards have different specific effects, but the common characteristic is sustained efficiency erosion—in every combat, curse cards will reduce the player's effective resources or increase operation costs in some form.
+
+**Curse card removal is limited and costly**. Main removal pathways include: store "remove card" services (requires paying gold), specific random event choice results, and special effects of extremely few cards. The scarcity of removal opportunities makes curse card management an important component of long-term strategy—players need to evaluate the trade-off between the immediate negative impact of curse cards and the opportunity cost of removal, deciding whether to clear immediately or temporarily tolerate.
+
+### 3.3 Card Special Attributes
+
+#### 3.3.1 Exhaust
+
+"Exhaust" is one of the core keywords in Slay the Spire's card system, marking the irreversibility of card use. **Cards with the Exhaust attribute, after being played, do not enter the Discard Pile but enter the Exhaust Pile directly, becoming unavailable again until the end of the current combat**.
+
+The design intent of the Exhaust attribute is to balance powerful effects with resource loss. Numerous exhaust cards have effect strength beyond conventional cards of the same cost, but the price is disappearing after single use. This "one-shot deal" characteristic requires players to precisely evaluate timing—using too early may waste potential value, while using too late may miss critical windows.
+
+The exhaust mechanism has deep synergy with specific builds. Certain card and relic effects are directly linked to exhaust behavior, transforming exhaust from pure resource loss into a source of profit. For example, the "Dead Branch" relic causes a random card to be added to hand each time a card is exhausted, an effect that transforms exhaust behavior into a resource generation engine. Another example is the "Corruption" Power card, which changes the energy cost of all Skill cards to 0 but exhausts them immediately after use, a design that creates explosive gameplay centered on exhaust.
+
+#### 3.3.2 Ethereal
+
+"Ethereal" is Slay the Spire's unique turn-binding mechanism, creating additional pressure for hand management. **Cards with the Ethereal attribute, if still retained in hand at turn end, are automatically exhausted**.
+
+The design function of the Ethereal attribute is to limit the滞留价值 of specific cards. Certain cards have effect strength or flexibility beyond convention, and the Ethereal attribute serves as a balance mechanism to prevent these cards from being retained indefinitely and used at the most critical moment. Ethereal forces players to choose between "immediate use" and "permanent loss," increasing decision urgency and tension.
+
+The Ethereal mechanism has interesting interactions with discard effects. **The "end of turn exhaust" trigger condition of Ethereal cards can be circumvented by active discarding**—if the player discards Ethereal cards before turn end (through specific card effects), they will not enter the Exhaust Pile but enter the Discard Pile, preserving the possibility of being drawn again in future cycles. This interaction provides additional operational space for Ethereal card management.
+
+#### 3.3.3 Innate
+
+"Innate" is a special attribute targeting the combat startup phase in Slay the Spire, with significant timing advantages. **Cards with the Innate attribute are placed directly in hand at combat start**, replacing the conventional draw process.
+
+The value of the Innate attribute is particularly prominent in specific builds. Numerous archetypes rely on key card combinations in the first turn—for example, quickly applying core negative statuses, establishing defense systems, or starting resource engines. The Innate attribute eliminates the "dead draw" risk of these key cards, transforming probability dependence into deterministic arrangement.
+
+The quantity constraint of the Innate mechanism is a balance consideration. **If too many cards have the Innate attribute, hand space will be severely squeezed, reducing tactical flexibility instead**. Therefore, the distribution of Innate attributes is carefully designed, usually only given to key cards with the most startup value.
+
+#### 3.3.4 Retain
+
+"Retain" is the direct opposition mechanism to the Ethereal attribute, granting cards cross-turn retention capabilities. **Cards with the Retain attribute, if not played by turn end, are retained in hand** rather than entering the Discard Pile.
+
+The strategic value of the Retain attribute lies in refined timing control. Players can use Retain cards as "strategic reserves," prioritizing the use of other cards in the current turn while saving Retain cards for more suitable subsequent turns. This cross-turn resource scheduling capability significantly expands tactical choice space, especially for managing high-cost key cards.
+
+The Retain mechanism has interactive constraints with the hand limit. **Retain cards also occupy the 10-card hand limit**, so excessive accumulation of Retain cards may cause draw effects to fail. Players need to balance "retention value" and "draw liquidity," avoiding excessive expansion of retention strategies.
+
+## 4. Combat Flow Architecture
+
+### 4.1 Basic Turn Structure
+
+#### 4.1.1 Player Turn Phases
+
+The player turn is the active decision phase in Slay the Spire combat, carrying the core tactical execution function. Player turns follow strict phase divisions, with each phase having clear rule definitions and operation constraints.
+
+**Start Phase** is the automatic execution part of the player turn, containing two core events: **energy refill** and **draw execution**. Energy refill resets the player's energy value to the baseline value (usually 3 points, modified by relics), regardless of how much energy remained last turn. Draw execution draws a fixed number of cards (usually 5, modified by relic and card effects) from the Draw Pile to the Hand. These two events are mandatory and automatically triggered—the player cannot intervene or skip.
+
+**Action Phase** is the core decision part of the player turn, where the player executes all active operations. Operable objects include: playing cards (select from hand, consume energy, execute effects), using potions (select from potion bar, execute effects, potion is consumed), and ending turn (actively terminating the action phase). The duration of the action phase is controlled by the player, who can choose to end the turn at any time, even with unused energy and hand cards remaining.
+
+**End Phase** is the automatic cleanup part of the player turn, executing key resource reset operations. Core events include: **all unused hand cards enter the Discard Pile**, **unused energy is cleared to zero**. These two events are mandatory—the player cannot retain hand cards to the next turn, nor can they accumulate energy for cross-turn use. The cleanup mechanism of the end phase is the core manifestation of Slay the Spire's "turn autonomy" principle—each turn is an independent resource unit, and past decisions do not directly continue.
+
+#### 4.1.2 Enemy Turn Phase
+
+The enemy turn is the passive response phase in combat, where the player mainly undertakes damage承受 and status management functions. Enemy turn execution is completely automated—the player cannot directly intervene in enemy action choices.
+
+The core event of the enemy turn is **intent execution**. At the beginning of their turn, each enemy executes corresponding actions based on the intent symbols displayed above their heads. Action types cover: direct attacks (dealing health damage to the player), Block acquisition (gaining defense values), negative status application (applying Weak, Vulnerable, etc. to the player), self-strengthening (gaining Strength, Dexterity, etc. attribute bonuses), special actions (summoning reinforcements, changing forms, fleeing, etc.).
+
+The automated execution of enemy turns forms a sharp contrast with the active decision-making of player turns. This asymmetric design creates unique strategic tension. Players need to arrange defenses in advance or accelerate offense in the player turn based on predictions of enemy intents, without being able to respond in real-time during the enemy turn. This "prediction-bearing" structure reinforces the importance of planning and amplifies the cost of misjudgment.
+
+### 4.2 Key State Reset Rules
+
+#### 4.2.1 Before Player Turn Begins
+
+Block value归零 is the most critical state reset event before the player turn begins. Block is the defense resource the player obtained through card effects in the previous turn, used to offset enemy attack damage. However, this defense resource has strict timeliness—**before each player turn begins, regardless of how much Block value remains, it is forcibly cleared to zero**.
+
+The Block归零 mechanism has profound impacts on defense strategies. Players cannot establish "permanent defense" through Block accumulation; each turn requires re-evaluating defense needs and investing corresponding resources. This design prevents excessive accumulation of defense strategies, ensuring combat dynamism and aggressiveness. At the same time, Block归零 also creates the concept of "defense windows"—players need to precisely predict enemy high-damage turns, concentrate defense resources at critical moments rather than dispersing them evenly.
+
+Specific cards and relics can modify the default rules of Block归零. Numerous effects provide special mechanisms of "Block doesn't disappear" or "retain partial Block," these mechanisms break the limitations of default rules and create unique defense build possibilities. However, these modification mechanisms usually have costs or limitations, requiring players to weigh at the build level.
+
+#### 4.2.2 Turn Transition
+
+Turn transitions are automated without player intervention. After the cleanup of the player turn end phase is completed, the system immediately switches to the enemy turn; after all intent execution of the enemy turn is completed, the system immediately switches back to the player turn, triggering the start phase of the new turn. This automated process ensures the compactness of combat rhythm, avoiding unnecessary waiting and decision gaps.
+
+The non-intervenability of turn transitions means players cannot "cut in line" to operate. For example, players cannot use potions or play cards for emergency response during the enemy turn—all defense arrangements must be completed in advance during the player turn. This design reinforces the importance of prediction and increases combat tension.
+
+### 4.3 Enemy Intent System
+
+#### 4.3.1 Intent Display Mechanism
+
+The enemy intent system is one of the core innovations of Slay the Spire's combat design, with its fundamental characteristic being **the complete transparent presentation of enemies' future actions to the player**. The symbols suspended above each enemy's head clearly indicate the action type they will execute next turn, and for attack intents, also display **damage values and attack counts**.
+
+The values displayed by intents have undergone real-time correction—**the displayed damage values are the final expected damage after comprehensive consideration of enemy base attack power, current Strength bonuses, player Weak status, player Vulnerable status, and other factors**. This real-time correction mechanism simplifies the player's calculation burden, making intent information directly referenceable for decision-making without requiring players to perform complex status stacking calculations themselves.
+
+The transparent design of the intent system is a key characteristic distinguishing Slay the Spire from traditional card games. In most card games, enemy actions have randomness or hiddenness, and players need to bear the risk of prediction errors; in Slay the Spire, enemy actions are deterministic and foreseeable, and the player's task is optimal planning based on deterministic information. This "deterministic fun" design philosophy reduces random frustration and reinforces strategy execution space.
+
+Hovering the mouse over intent symbols can display more detailed explanatory information, including specific effect descriptions of actions, possible status impacts, etc. This design provides deep information acquisition pathways while maintaining interface简洁, satisfying the information needs of players at different levels.
+
+#### 4.3.2 Intent Classification System
+
+Slay the Spire's intent system establishes a fine classification system, covering all action types enemies may execute:
+
+**Offensive Intents** are displayed in tiers according to expected damage amount, forming clear threat level identifiers:
+
+| Damage Range | Intent Icon Characteristics | Threat Assessment | Typical Response Strategy |
+|-------------|----------------------------|-------------------|---------------------------|
+| 0-4 | Basic attack icon | Minimal threat, defense can be ignored | Prioritize output, delay defense |
+| 5-9 | Enhanced attack icon | Low threat, basic defense sufficient | Moderate Block or quick kill |
+| 10-14 | Significant attack icon | Medium threat, requires attention | Ensure basic defense coverage |
+| 15-19 | High-intensity attack icon | High threat, defense must be arranged | Concentrate resources on defense or control |
+| 20-24 | Extreme-intensity attack icon | Extreme threat, full defense required | Maximize Block or emergency evasion |
+| 25-29 | Lethal attack icon | Lethal threat, defense priority above all | All resources invested in survival |
+| 30+ | Devastating attack icon | Devastating threat, special response required | Rely on specific cards or relic effects |
+
+**Defensive Intents** identify enemy non-attack actions:
+
+- **Block Intent**: Enemy will gain defense values, reducing subsequent damage taken
+- **Buff Intent**: Enemy will gain attribute bonuses (such as Strength, Dexterity), increasing subsequent threat levels
+
+**Compound Intents** identify combination actions with both attack and non-attack components:
+
+| Compound Type | Attack Component | Non-attack Component | Strategic Impact |
+|--------------|------------------|----------------------|------------------|
+| Debuff Offense | Deals damage | Applies negative status | Needs to balance defense and status removal |
+| Defensive Offense | Deals damage | Ally gains Block | Output window limited, needs to break through defense |
+| Buff Offense | Deals damage | Ally gains buff | Needs to accelerate killing to prevent snowball |
+| Debuff Defense | Gains Block | Applies negative status | Needs to prioritize breaking defense or bearing cost |
+| Buff Defense | Gains Block | Ally gains buff | Dual delayed threat, needs active pressure |
+
+**Special Intents** identify unconventional actions:
+
+| Special Intent | Effect Description | Response Strategy |
+|---------------|-------------------|-------------------|
+| Escape | Enemy will脱离 combat at turn start | Accelerate killing or accept loss |
+| Sleep | Enemy takes no action this turn | Utilize free turn to establish advantage |
+| Stunned | Enemy is controlled, takes no action this turn | Plan control chain or output window |
+| Unknown | Special action not belonging to any above category | Rely on experience or general preparation |
+
+#### 4.3.3 Intent Hidden Conditions
+
+The transparency of the intent system is not absolute; under specific conditions, the player's intent vision may be restricted. The core restriction source is the relic "Runic Dome"—**this relic provides +1 energy per turn while making the player unable to see enemy intents**. This design creates a high-risk, high-reward tradeoff structure, requiring players to predict enemy actions based on memory, pattern recognition, or probability inference.
+
+Notably, **intent hiding does not completely abolish intent-related mechanism interactions**. Certain card effects have mechanism associations with intents—for example, "Strike" when enemy intent is attack triggers additional effects, "Observe" provides different benefits based on intent type. These cards can still trigger and take effect normally under the influence of Runic Dome; their trigger conditions are determined by internal system judgment rather than player visual confirmation. This design preserves mechanism integrity while increasing the challenge of information asymmetry.
+
+## 5. Relic System
+
+### 5.1 Relic Acquisition Pathways
+
+#### 5.1.1 Regular Acquisition
+
+Relics are the core collection elements in Slay the Spire that provide permanent passive effects, with acquisition pathways贯穿整个冒险进程:
+
+| Acquisition Pathway | Acquisition Condition | Relic Characteristics | Strategic Impact |
+|--------------------|----------------------|----------------------|------------------|
+| Elite Combat Reward | Defeat Elite enemy | Guaranteed drop, medium quality | Encourages risk challenge, core of route planning |
+| Chest Opening | Map exploration discovery | Free acquisition, random quality | Exploration incentive, no-cost benefit |
+| Store Purchase | Pay gold | Selectable, fixed price | Economic system interaction, demand matching |
+| Random Event | Event choice result | Contextual acquisition, may have附加代价 | Narrative integration, decision complexity |
+
+Elite combat rewards are one of the main sources of relic acquisition. After defeating Elite enemies, players **guaranteed receive a relic reward**. Elite enemies are强化版 ordinary enemies, with higher health, stronger attack power, and special abilities, but correspondingly richer loot. The risk-benefit structure of Elite combat makes players need to weigh relic needs against combat risks when route planning.
+
+#### 5.1.2 Special Acquisition
+
+**Boss Relics** are a special category in the relic system, only obtainable through three-choice selection after defeating floor Bosses. Boss Relics have more powerful effects compared to regular relics, but also come with more significant negative costs or limiting conditions. The choice of Boss Relics is a key decision point after clearing a floor, and its selection results will profoundly influence the build direction of subsequent adventures.
+
+Specific random events provide exclusive relic rewards—these relics cannot be obtained through other pathways. Event-exclusive relics are usually associated with the thematic narrative of the event, having unique flavor and mechanic design.
+
+### 5.2 Relic Effect Types
+
+#### 5.2.1 One-Time Effects
+
+Some relics trigger their effects immediately upon acquisition, then no longer produce any impact. These "one-time" relics usually provide immediate resource replenishment—for example, giving the player a certain amount of gold when obtained. One-time relic value assessment is relatively direct: Is the immediate resource worth the relic slot occupation? In most cases, the design intent of one-time relics is as "consolation prizes" or "startup funds," with their value decreasing as the game progresses.
+
+#### 5.2.2 Persistent Effects
+
+The vast majority of relics provide persistent passive effects, remaining active throughout the adventure. Persistent effect trigger conditions are diverse:
+
+| Trigger Condition | Effect Examples | Strategic Value |
+|------------------|-----------------|-----------------|
+| Turn Trigger | Automatically takes effect at turn start (energy gain, draw gain) | Stable accumulation, high long-term value |
+| Combat Trigger | Takes effect at combat start or specific combat phase | Startup advantage, rhythm control |
+| Condition Trigger | Automatically takes effect when specific conditions are met (playing specific card types, health changes, card exhaust, etc.) | Build synergy, transforms behavior |
+| Permanent Modification | Directly modifies base values (health limit, hand limit, gold acquisition amount, etc.) | Global change, foundation strengthening |
+
+The value assessment of persistent relics needs to consider cross-turn and cross-combat cumulative effects. A relic providing minor benefits per turn may produce huge cumulative value in a complete adventure lasting dozens of combats; conversely, a relic only effective in specific scenarios may have its overall value severely limited by usage frequency.
+
+### 5.3 Negative Relic Mechanisms
+
+#### 5.3.1 Cost-Type Relics
+
+Cost-type relics are a core innovation of Slay the Spire's relic design, with a structural pattern of **"powerful gain + significant cost"**. This design breaks the stereotype of "relic = pure benefit" in traditional games, transforming relic selection into complex risk-benefit tradeoffs.
+
+The cost types of cost-type relics cover a wide range of mechanic dimensions, as detailed in the Energy System chapter. The selection of these relics is one of the most profound decisions in Slay the Spire—the same relic may have completely different values depending on character, build, and game stage.
+
+#### 5.3.2 Curse-Type Relics
+
+Curse-type relics are the extreme form of cost-type relics, with their negative effects continuously applied in the form of curse cards. The typical representative of curse-type relics is "Cursed Key": gain 1 energy at the start of each turn, but gain a curse each time a non-Boss chest is opened. This design transforms the cost from immediate constraints into long-term burdens, with the continuous existence of curse cards constantly eroding deck efficiency.
+
+Curse-type relic management requires comprehensive strategy. Players need to evaluate: Is the immediate value of energy gain sufficient to offset the long-term cost of curse cards? Are there sufficient curse removal opportunities to clear accumulated curses? Does the specific type of curse card have synergy with the current build (certain builds can transform curse cards into profit sources)? These evaluations make the selection of curse-type relics an important testing ground for high-level strategy.
+
+## 6. Potion System
+
+### 6.1 Potion Basic Rules
+
+#### 6.1.1 Usage Restrictions
+
+Potions are consumable active items in Slay the Spire, with their use subject to clear rule constraints:
+
+| Restriction Type | Specific Rules | Exception Cases | Strategic Impact |
+|-----------------|---------------|-----------------|------------------|
+| Usage Count | **One-time consumption**, removed after use | None | Timing choice is crucial |
+| Usage Scenario | **Mostly limited to use during combat** | Fruit Juice, Chaos Potion, Blood Potion can be used outside combat | Distinction between emergency reserves and daily management |
+| Slot Count | Standard **3 slots** | Ascension 11+ reduced to 2 | Inventory pressure increases with difficulty |
+
+The one-time consumable attribute is the core characteristic of potions. Each potion is consumed after use, removed from the potion slot, and cannot be reused. This attribute positions potions as "strategic reserve resources"—precious but limited, needing to be deployed at the most critical moments.
+
+Usage scenario restrictions further constrain the functional scope of potions. **Under standard rules, potions are limited to use during combat**, non-combat scenarios cannot activate potion effects. This restriction binds potions to combat decision scenarios, reinforcing the resource management complexity of the combat phase. However, explicit exception cases grant specific potions additional strategic flexibility—Fruit Juice (permanently increases max health), Chaos Potion (randomly fills potion slots), and Blood Potion (restores health) can be used outside combat, these exceptions usually corresponding to critical needs in non-combat scenarios.
+
+#### 6.1.2 Slot Management
+
+Potion slot management is a continuous task贯穿冒险进程. Core management decisions include:
+
+- **Acquisition Decision**: When encountering new potions, evaluate their relative value and decide whether to include them in slots
+- **Usage Decision**: In combat, evaluate the current situation and decide whether to use potions and which potion to use
+- **Combination Optimization**: Different potions have synergistic effects and substitution relationships; optimize combinations to cover diverse combat scenarios
+
+The processing rules when slots are full create clear trade-off mechanisms: **must choose to replace existing potions or abandon the new potion**. This decision requires comparing the expected value of existing potions with the immediate value of new potions, often without a universally optimal answer.
+
+### 6.2 Potion Acquisition Mechanisms
+
+#### 6.2.1 Combat Drops
+
+Combat drops are the primary source of potion acquisition, with probability mechanisms that are ingeniously designed and have dynamic adjustment characteristics:
+
+| Parameter | Value/Rules |
+|-----------|-------------|
+| Base Drop Probability | **40%** |
+| Dynamic Adjustment | -10% if dropped, +10% if not dropped |
+| Probability Boundaries | Implicit upper and lower limits (not explicitly stated) |
+| Deterministic Override | Specific relics can guarantee 100% drop |
+
+The **dynamic probability adjustment mechanism** creates "compensatory probability"—when potion drops have not been obtained for a long time, subsequent combat drop probabilities will gradually increase until a drop is triggered; conversely, probabilities will gradually decrease with consecutive drops. This design smooths the random fluctuations of potion acquisition, avoiding extreme "flood or drought" situations.
+
+#### 6.2.2 Other Sources
+
+| Source Type | Specific Pathway | Characteristic Description |
+|-------------|-----------------|----------------------------|
+| Store Purchase | Direct gold transaction | Selectable, immediate acquisition |
+| Boss Reward | Randomly obtained after defeating floor Boss | Extra benefit of combat victory |
+| Specific Events | Lab, Woman in Blue, All-seeing Skull | Contextual acquisition, may have附加代价 |
+| Card Effects | "Alchemize" and other cards | Built-in generation ability of deck |
+| Relic Effects | Cauldron (5 random potions when obtained), Tiny House (1 random potion when obtained) | Immediate replenishment, startup advantage |
+
+### 6.3 Potion Rarity and Effects
+
+#### 6.3.1 Rarity Distribution
+
+| Rarity | Probability | Value Positioning |
+|--------|-------------|-------------------|
+| Common | **65%** | Basic effects, reliable but no surprises |
+| Uncommon | **25%** | Enhanced effects, situational value prominent |
+| Rare | **10%** | Unique mechanics, build core potential |
+
+The direct association between rarity and acquisition probability means that in most cases (65%), players obtain common potions, while uncommon and rare potions require a certain amount of luck accumulation. Rarity is also linked to store prices—the higher the rarity of the same effect type of potion, the more expensive the purchase price.
+
+#### 6.3.2 Effect Type Overview
+
+| Function Category | Representative Potions | Core Effect | Typical Application Scenarios |
+|------------------|----------------------|-------------|------------------------------|
+| Buff | Strength Potion, Dexterity Potion, Block Potion, Energy Potion, Speed Potion | Temporary attribute boost | Burst output, emergency defense, resource replenishment |
+| Damage | Explosive Potion, Fire Potion, Poison Potion | Direct damage or status application | Output supplement, enemy clearance |
+| Function | Draw Potion, Duplication Potion, Chaos Potion, Smoke Bomb | Special operation capabilities | Deck manipulation, emergency evasion, resource generation |
+| Restoration | Health Potion, Fruit Juice, Regeneration Potion | Health restoration or boost | Survival guarantee, long-term development |
+
+#### 6.3.3 Special Effect Interactions
+
+The potion system has rich interaction effects with the relic system, these interactions expanding the space of potion strategy. **The "Sacred Bark" relic is the most significant interaction source—it can double the effects of most potions**. This doubling effect can transform ordinary potions into powerful resources, such as Energy Potion from 2 energy to 4 energy, Health Potion recovery amount doubled, etc.
+
+However, the doubling effect has a clear exception list: Ambrosia, Blessing of the Forge, Chaos Potion, Entropic Brew, Gambler's Brew, Smoke Bomb, Stance Potion, etc. are not affected by doubling. These exceptions are usually because the potion effects themselves are not suitable for numerical doubling (such as the randomness of Chaos Potion, the functionality of Smoke Bomb).
+
+Another important interaction is "Toy Ornithopter"—**restore 5 health when using a potion**, this effect binds potion use with health recovery, encouraging active potion usage strategies.

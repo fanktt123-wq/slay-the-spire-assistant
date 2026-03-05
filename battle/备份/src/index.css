@@ -1,0 +1,136 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 220 20% 5%;
+    --foreground: 0 0% 98%;
+    --card: 220 15% 10%;
+    --card-foreground: 0 0% 98%;
+    --popover: 220 15% 10%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 260 60% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 10% 15%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 220 10% 20%;
+    --muted-foreground: 220 10% 60%;
+    --accent: 260 60% 50%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 10% 20%;
+    --input: 220 10% 15%;
+    --ring: 260 60% 50%;
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer components {
+  /* 自定义滚动条 */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--background));
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted));
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground));
+  }
+
+  /* 卡牌悬停效果 */
+  .card-hover {
+    @apply transition-all duration-200;
+  }
+  
+  .card-hover:hover {
+    @apply scale-105 shadow-xl;
+  }
+
+  /* 能量球样式 */
+  .energy-orb {
+    @apply w-8 h-8 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 
+           flex items-center justify-center text-white font-bold shadow-lg
+           border-2 border-yellow-300;
+  }
+
+  /* 血量条动画 */
+  .hp-bar {
+    @apply transition-all duration-500 ease-out;
+  }
+
+  /* Buff/Debuff 徽章 */
+  .buff-badge {
+    @apply px-2 py-1 rounded-md text-xs font-medium
+           bg-green-900/50 border border-green-700 text-green-200;
+  }
+  
+  .debuff-badge {
+    @apply px-2 py-1 rounded-md text-xs font-medium
+           bg-red-900/50 border border-red-700 text-red-200;
+  }
+
+  /* 意图图标 */
+  .intent-attack {
+    @apply text-red-400;
+  }
+  
+  .intent-defend {
+    @apply text-blue-400;
+  }
+  
+  .intent-buff {
+    @apply text-green-400;
+  }
+  
+  .intent-debuff {
+    @apply text-purple-400;
+  }
+}
+
+@layer utilities {
+  /* 文字渐变 */
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-400;
+  }
+
+  /* 玻璃态效果 */
+  .glass {
+    @apply bg-white/5 backdrop-blur-sm border border-white/10;
+  }
+
+  /* 发光效果 */
+  .glow {
+    box-shadow: 0 0 20px hsl(var(--primary) / 0.3);
+  }
+
+  /* 卡片阴影 */
+  .card-shadow {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3),
+                0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  }
+}

@@ -1,0 +1,50 @@
+[
+  {
+    "id": "fire_potion",
+    "name": "火焰药水",
+    "nameEn": "Fire Potion",
+    "description": "造成20点伤害。"
+  },
+  {
+    "id": "block_potion",
+    "name": "格挡药水",
+    "nameEn": "Block Potion",
+    "description": "获得12点格挡。"
+  },
+  {
+    "id": "strength_potion",
+    "name": "力量药水",
+    "nameEn": "Strength Potion",
+    "description": "获得2点力量。"
+  },
+  {
+    "id": "dexterity_potion",
+    "name": "敏捷药水",
+    "nameEn": "Dexterity Potion",
+    "description": "获得2点敏捷。"
+  },
+  {
+    "id": "healing_potion",
+    "name": "治疗药水",
+    "nameEn": "Healing Potion",
+    "description": "恢复10点生命。"
+  },
+  {
+    "id": "energy_potion",
+    "name": "能量药水",
+    "nameEn": "Energy Potion",
+    "description": "获得2点能量。"
+  },
+  {
+    "id": "ancient_potion",
+    "name": "远古药水",
+    "nameEn": "Ancient Potion",
+    "description": "获得1层人工制品。"
+  },
+  {
+    "id": "liquid_memories",
+    "name": "液态记忆",
+    "nameEn": "Liquid Memories",
+    "description": "选择弃牌堆中的一张牌放入手牌，它本回合耗能变为0。"
+  }
+]

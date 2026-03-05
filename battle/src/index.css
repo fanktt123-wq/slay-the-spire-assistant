@@ -1,0 +1,280 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* 现代化暗色主题配色方案 - 深蓝紫色调 */
+    --background: 222 47% 6%;
+    --foreground: 210 40% 96%;
+    --card: 222 47% 8%;
+    --card-foreground: 210 40% 96%;
+    --popover: 222 47% 8%;
+    --popover-foreground: 210 40% 96%;
+    
+    /* 主色调 - 紫罗兰 */
+    --primary: 263 70% 50%;
+    --primary-foreground: 210 40% 98%;
+    
+    /* 次要色 - 深蓝灰 */
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 96%;
+    
+    /* 静音色 */
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 55%;
+    
+    /* 强调色 - 亮紫 */
+    --accent: 263 70% 55%;
+    --accent-foreground: 210 40% 98%;
+    
+    /* 危险色 - 玫瑰红 */
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 210 40% 98%;
+    
+    /* 边框和输入 */
+    --border: 217 33% 20%;
+    --input: 217 33% 15%;
+    --ring: 263 70% 50%;
+    --radius: 0.75rem;
+    
+    /* 自定义颜色变量 */
+    --bg-primary: #0a0f1c;
+    --bg-secondary: #111827;
+    --bg-tertiary: #1a2234;
+    --bg-card: #131b2e;
+    --bg-hover: #1e293b;
+    
+    --accent-purple: #8b5cf6;
+    --accent-blue: #3b82f6;
+    --accent-cyan: #06b6d4;
+    --accent-pink: #ec4899;
+    --accent-amber: #f59e0b;
+    
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    
+    --border-subtle: rgba(148, 163, 184, 0.1);
+    --border-default: rgba(148, 163, 184, 0.2);
+    
+    --glow-purple: rgba(139, 92, 246, 0.4);
+    --glow-blue: rgba(59, 130, 246, 0.4);
+    --glow-cyan: rgba(6, 182, 212, 0.4);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply antialiased;
+    background: linear-gradient(180deg, var(--bg-primary) 0%, #0d1321 50%, var(--bg-primary) 100%);
+    color: var(--text-primary);
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer components {
+  /* 自定义滚动条 - 更精致的暗色风格 */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #334155 0%, #475569 100%);
+    border-radius: 3px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #475569 0%, #64748b 100%);
+  }
+
+  /* 卡牌悬停效果 - 增强版 */
+  .card-hover {
+    @apply transition-all duration-300 ease-out;
+  }
+  
+  .card-hover:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 
+      0 20px 40px -10px rgba(0, 0, 0, 0.5),
+      0 0 20px var(--glow-purple);
+  }
+
+  /* 能量球样式 - 金色发光 */
+  .energy-orb {
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+    box-shadow: 
+      0 0 20px rgba(251, 191, 36, 0.5),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    @apply w-8 h-8 rounded-full flex items-center justify-center text-white font-bold;
+    border: 2px solid rgba(251, 191, 36, 0.5);
+  }
+
+  /* 血量条动画 */
+  .hp-bar {
+    @apply transition-all duration-500 ease-out;
+  }
+
+  /* Buff/Debuff 徽章 - 新配色 */
+  .buff-badge {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(22, 163, 74, 0.3) 100%);
+    border: 1px solid rgba(34, 197, 94, 0.4);
+    @apply px-2 py-1 rounded-md text-xs font-medium text-green-400;
+  }
+  
+  .debuff-badge {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(220, 38, 38, 0.3) 100%);
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    @apply px-2 py-1 rounded-md text-xs font-medium text-red-400;
+  }
+
+  /* 意图图标 - 增强 */
+  .intent-attack {
+    @apply text-rose-400;
+    text-shadow: 0 0 10px rgba(251, 113, 133, 0.5);
+  }
+  
+  .intent-defend {
+    @apply text-cyan-400;
+    text-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
+  }
+  
+  .intent-buff {
+    @apply text-emerald-400;
+    text-shadow: 0 0 10px rgba(52, 211, 153, 0.5);
+  }
+  
+  .intent-debuff {
+    @apply text-violet-400;
+    text-shadow: 0 0 10px rgba(167, 139, 250, 0.5);
+  }
+
+  /* 玻璃态卡片 - 增强版 */
+  .glass-card {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.8) 100%);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-default);
+    box-shadow: 
+      0 4px 6px -1px rgba(0, 0, 0, 0.3),
+      0 2px 4px -2px rgba(0, 0, 0, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+
+  /* 霓虹发光边框 */
+  .glow-border {
+    border: 1px solid transparent;
+    background: linear-gradient(var(--bg-card), var(--bg-card)) padding-box,
+                linear-gradient(135deg, var(--accent-purple), var(--accent-blue)) border-box;
+  }
+
+  /* 敌人卡片样式 - 根据类型 */
+  .enemy-card-normal {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.7) 100%);
+    border: 1px solid rgba(100, 116, 139, 0.3);
+  }
+  
+  .enemy-card-elite {
+    background: linear-gradient(135deg, rgba(234, 179, 8, 0.1) 0%, rgba(15, 23, 42, 0.7) 100%);
+    border: 1px solid rgba(234, 179, 8, 0.4);
+    box-shadow: 0 0 20px rgba(234, 179, 8, 0.15);
+  }
+  
+  .enemy-card-boss {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(15, 23, 42, 0.7) 100%);
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.15);
+  }
+
+  /* 按钮渐变样式 */
+  .btn-gradient-primary {
+    background: linear-gradient(135deg, var(--accent-purple) 0%, #7c3aed 100%);
+    box-shadow: 0 4px 15px -2px rgba(139, 92, 246, 0.4);
+    @apply text-white font-medium;
+  }
+  
+  .btn-gradient-primary:hover {
+    background: linear-gradient(135deg, #9061f9 0%, #8b5cf6 100%);
+    box-shadow: 0 6px 20px -2px rgba(139, 92, 246, 0.5);
+  }
+
+  /* 输入框样式 */
+  .input-glass {
+    background: rgba(30, 41, 59, 0.5);
+    border: 1px solid rgba(71, 85, 105, 0.5);
+    @apply rounded-lg px-3 py-2 text-sm;
+  }
+  
+  .input-glass:focus {
+    outline: none;
+    border-color: var(--accent-purple);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+  }
+}
+
+@layer utilities {
+  /* 文字渐变 */
+  .text-gradient {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, #c084fc 0%, #818cf8 50%, #60a5fa 100%);
+  }
+  
+  .text-gradient-gold {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, #fcd34d 0%, #fbbf24 50%, #f59e0b 100%);
+  }
+
+  /* 玻璃态效果 */
+  .glass {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* 发光效果 */
+  .glow {
+    box-shadow: 0 0 30px rgba(139, 92, 246, 0.3);
+  }
+  
+  .glow-amber {
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
+  }
+  
+  .glow-red {
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+  }
+
+  /* 卡片阴影 */
+  .card-shadow {
+    box-shadow: 
+      0 10px 30px -5px rgba(0, 0, 0, 0.4),
+      0 4px 10px -3px rgba(0, 0, 0, 0.2);
+  }
+
+  /* 动态背景 */
+  .bg-animated {
+    background: 
+      radial-gradient(ellipse at top, rgba(139, 92, 246, 0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at bottom right, rgba(59, 130, 246, 0.06) 0%, transparent 40%),
+      radial-gradient(ellipse at bottom left, rgba(6, 182, 212, 0.05) 0%, transparent 40%),
+      var(--bg-primary);
+  }
+
+  /* 分隔线渐变 */
+  .divider-gradient {
+    background: linear-gradient(90deg, transparent 0%, rgba(148, 163, 184, 0.3) 50%, transparent 100%);
+    height: 1px;
+  }
+}

@@ -1,0 +1,29 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Microsoft YaHei', 'PingFang SC', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #1a1a2e;
+  min-height: 100vh;
+  color: #ecf0f1;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* 全局过渡效果 */
+* {
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+/* 选中文本样式 */
+::selection {
+  background: rgba(241, 196, 15, 0.3);
+  color: white;
+}

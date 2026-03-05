@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>杀戮尖塔助手</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #0a0a0f 0%, #12121a 50%, #1a1a25 100%);
+      color: #e8e8f0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 900px;
+      width: 100%;
+      text-align: center;
+    }
+    
+    .header {
+      margin-bottom: 50px;
+    }
+    
+    .header h1 {
+      font-size: 48px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #00d9a5 0%, #00d4ff 50%, #b967ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 15px;
+      text-shadow: 0 0 40px rgba(0, 217, 165, 0.3);
+    }
+    
+    .header p {
+      font-size: 18px;
+      color: #8888a0;
+    }
+    
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 25px;
+      margin-bottom: 40px;
+    }
+    
+    .card {
+      background: linear-gradient(135deg, #1a1a25 0%, #252533 100%);
+      border: 1px solid #2a2a3c;
+      border-radius: 16px;
+      padding: 35px 25px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: block;
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+    
+    .card.battle:hover {
+      border-color: #ff4757;
+      box-shadow: 0 20px 40px rgba(255, 71, 87, 0.2);
+    }
+    
+    .card.deck:hover {
+      border-color: #00d9a5;
+      box-shadow: 0 20px 40px rgba(0, 217, 165, 0.2);
+    }
+    
+    .card.admin:hover {
+      border-color: #00d4ff;
+      box-shadow: 0 20px 40px rgba(0, 212, 255, 0.2);
+    }
+    
+    .card-icon {
+      font-size: 48px;
+      margin-bottom: 20px;
+    }
+    
+    .card h2 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #ffffff;
+    }
+    
+    .card.battle h2 {
+      color: #ff6b7a;
+    }
+    
+    .card.deck h2 {
+      color: #00f0b5;
+    }
+    
+    .card.admin h2 {
+      color: #5ee7ff;
+    }
+    
+    .card p {
+      font-size: 14px;
+      color: #8888a0;
+      line-height: 1.6;
+    }
+    
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      margin-top: 15px;
+    }
+    
+    .badge.battle {
+      background: rgba(255, 71, 87, 0.2);
+      color: #ff6b7a;
+    }
+    
+    .badge.deck {
+      background: rgba(0, 217, 165, 0.2);
+      color: #00f0b5;
+    }
+    
+    .badge.admin {
+      background: rgba(0, 212, 255, 0.2);
+      color: #5ee7ff;
+    }
+    
+    .footer {
+      margin-top: 30px;
+      padding-top: 30px;
+      border-top: 1px solid #2a2a3c;
+    }
+    
+    .footer p {
+      font-size: 13px;
+      color: #4a4a5c;
+    }
+    
+    .footer a {
+      color: #00d9a5;
+      text-decoration: none;
+    }
+    
+    .footer a:hover {
+      text-decoration: underline;
+    }
+    
+    .version {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      font-size: 12px;
+      color: #4a4a5c;
+    }
+    
+    @media (max-width: 768px) {
+      .header h1 {
+        font-size: 32px;
+      }
+      
+      .cards {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🎴 杀戮尖塔助手</h1>
+      <p>基于 LLM 的智能辅助工具</p>
+    </div>
+    
+    <div class="cards">
+      <a href="/battle" class="card battle">
+        <div class="card-icon">⚔️</div>
+        <h2>实时对战</h2>
+        <p>模拟战斗场景，配置角色、敌人、手牌等状态，获取 AI 战斗决策建议</p>
+        <span class="badge battle">Battle Simulator</span>
+      </a>
+      
+      <a href="/deck" class="card deck">
+        <div class="card-icon">🎯</div>
+        <h2>卡组构筑</h2>
+        <p>构建和分析卡组，与 AI 对话获取构筑建议，查看卡组统计分析</p>
+        <span class="badge deck">Deck Builder</span>
+      </a>
+      
+      <a href="/admin" class="card admin">
+        <div class="card-icon">🗃️</div>
+        <h2>数据管理</h2>
+        <p>管理卡牌、遗物、敌人、Buff 等游戏数据，支持 JSON 导入导出</p>
+        <span class="badge admin">Data Admin</span>
+      </a>
+    </div>
+    
+    <div class="footer">
+      <p>后端 API: <a href="/api/cards">/api/cards</a> | <a href="/api/relics">/api/relics</a> | <a href="/api/enemies">/api/enemies</a></p>
+    </div>
+  </div>
+  
+  <div class="version">v1.0</div>
+  
+  <script>
+    // 添加卡片点击动画效果
+    document.querySelectorAll('.card').forEach(card => {
+      card.addEventListener('click', function(e) {
+        this.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+          this.style.transform = '';
+        }, 100);
+      });
+    });
+  </script>
+</body>
+</html>

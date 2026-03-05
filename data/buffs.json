@@ -1,0 +1,933 @@
+{
+  "shared_buff": [
+    {
+      "id": "artifact",
+      "name": "神器",
+      "nameEn": "Artifact",
+      "description": "免疫下一个负面效果",
+      "details": "抵消下 X 次受到的负面效果（减益）。"
+    },
+    {
+      "id": "barricade",
+      "name": "壁垒",
+      "nameEn": "Barricade",
+      "description": "格挡不会消失",
+      "details": "回合结束时保留所有格挡，不会重置为0。"
+    },
+    {
+      "id": "buffer",
+      "name": "缓冲",
+      "nameEn": "Buffer",
+      "description": "防止下 X 次生命损失",
+      "details": "防止下 X 次你将要失去的生命值。"
+    },
+    {
+      "id": "dexterity",
+      "name": "敏捷",
+      "nameEn": "Dexterity",
+      "description": "获得额外格挡",
+      "details": "每点敏捷使从卡牌获得的格挡增加 X。"
+    },
+    {
+      "id": "draw_card",
+      "name": "抽牌",
+      "nameEn": "Draw Card",
+      "description": "额外抽 X 张牌",
+      "details": "抽 X 张额外的卡牌。"
+    },
+    {
+      "id": "energized",
+      "name": " energized",
+      "nameEn": "Energized",
+      "description": "下回合获得额外能量",
+      "details": "下回合开始时获得 X 点额外能量。"
+    },
+    {
+      "id": "focus",
+      "name": "集中",
+      "nameEn": "Focus",
+      "description": "充能球效果增强",
+      "details": "每点集中使充能球造成的伤害增加 X。"
+    },
+    {
+      "id": "intangible",
+      "name": "无形",
+      "nameEn": "Intangible",
+      "description": "受到的所有伤害和生命损失降为1",
+      "details": "X 回合内，受到的所有伤害和生命损失降为1。"
+    },
+    {
+      "id": "mantra",
+      "name": "真言",
+      "nameEn": "Mantra",
+      "description": "获得10层真言时进入神格姿态",
+      "details": "当你获得 10 层真言时，进入神格姿态。"
+    },
+    {
+      "id": "metallicize",
+      "name": "金属化",
+      "nameEn": "Metallicize",
+      "description": "回合结束时获得格挡",
+      "details": "回合结束时获得 X 点格挡。"
+    },
+    {
+      "id": "next_turn_block",
+      "name": "下回合格挡",
+      "nameEn": "Next Turn Block",
+      "description": "下回合获得格挡",
+      "details": "下回合开始时获得 X 点格挡。"
+    },
+    {
+      "id": "plated_armor",
+      "name": "多层护甲",
+      "nameEn": "Plated Armor",
+      "description": "回合开始时获得格挡，受攻击时减少",
+      "details": "回合开始时获得 X 点格挡。受到攻击伤害时，失去 1 层多层护甲。"
+    },
+    {
+      "id": "ritual",
+      "name": "仪式",
+      "nameEn": "Ritual",
+      "description": "回合结束时获得力量",
+      "details": "在其回合结束时，获得 X 点力量。"
+    }
+  ],
+  "player_buff": [
+    {
+      "id": "accuracy",
+      "name": "精准",
+      "nameEn": "Accuracy",
+      "description": "小刀造成额外伤害",
+      "details": "小刀造成 X 点额外伤害。"
+    },
+    {
+      "id": "after_image",
+      "name": "残影",
+      "nameEn": "After Image",
+      "description": "打出牌时获得格挡",
+      "details": "每当你打出一张牌，获得 X 点格挡。"
+    },
+    {
+      "id": "amplify",
+      "name": "增幅",
+      "nameEn": "Amplify",
+      "description": "下 X 张能力牌打出两次",
+      "details": "你的下 X 张能力牌会打出两次。"
+    },
+    {
+      "id": "battle_hymn",
+      "name": "战斗圣歌",
+      "nameEn": "Battle Hymn",
+      "description": "回合开始时添加打击到手牌",
+      "details": "在你的回合开始时，将 X 张打击加入你的手牌。"
+    },
+    {
+      "id": "berserk",
+      "name": "狂暴",
+      "nameEn": "Berserk",
+      "description": "回合开始时获得能量",
+      "details": "在你的回合开始时，获得 X 点能量。"
+    },
+    {
+      "id": "blur",
+      "name": "模糊",
+      "nameEn": "Blur",
+      "description": "格挡不会在下 X 回合消失",
+      "details": "格挡不会在你下 X 个回合开始时消失。"
+    },
+    {
+      "id": "brutality",
+      "name": "残忍",
+      "nameEn": "Brutality",
+      "description": "回合开始时失去生命并抽牌",
+      "details": "在你的回合开始时，失去 X 点生命并抽 X 张牌。"
+    },
+    {
+      "id": "burst",
+      "name": "爆发",
+      "nameEn": "Burst",
+      "description": "下 X 张技能牌打出两次",
+      "details": "你的下 X 张技能牌会打出两次。"
+    },
+    {
+      "id": "collect",
+      "name": "收集",
+      "nameEn": "Collect",
+      "description": "下 X 回合将奇迹+加入手牌",
+      "details": "在你的下 X 个回合开始时，将一张奇迹+加入你的手牌。"
+    },
+    {
+      "id": "combust",
+      "name": "燃烧",
+      "nameEn": "Combust",
+      "description": "回合结束时失去生命并对所有敌人造成伤害",
+      "details": "在你的回合结束时，失去 1 点生命并对所有敌人造成 X 点伤害。"
+    },
+    {
+      "id": "corruption",
+      "name": "腐化",
+      "nameEn": "Corruption",
+      "description": "技能牌消耗为0但会被消耗",
+      "details": "技能牌消耗为 0。每当你打出一张技能牌，将其消耗。"
+    },
+    {
+      "id": "creative_ai",
+      "name": "创造性AI",
+      "nameEn": "Creative AI",
+      "description": "回合开始时添加随机能力牌到手牌",
+      "details": "在你的回合开始时，将 X 张随机能力牌加入你的手牌。"
+    },
+    {
+      "id": "dark_embrace",
+      "name": "黑暗之拥",
+      "nameEn": "Dark Embrace",
+      "description": "消耗牌时抽牌",
+      "details": "每当你消耗一张牌，抽 X 张牌。"
+    },
+    {
+      "id": "demon_form",
+      "name": "恶魔形态",
+      "nameEn": "Demon Form",
+      "description": "回合开始时获得力量",
+      "details": "在你的回合开始时，获得 X 点力量。"
+    },
+    {
+      "id": "deva_form",
+      "name": "天形态",
+      "nameEn": "Deva Form",
+      "description": "回合开始时获得能量并增加能量获取",
+      "details": "在你的回合开始时获得 N 次能量，并将此能量获取增加 X。"
+    },
+    {
+      "id": "devotion",
+      "name": "虔诚",
+      "nameEn": "Devotion",
+      "description": "回合开始时获得真言",
+      "details": "在你的回合开始时，获得 X 层真言。"
+    },
+    {
+      "id": "double_damage",
+      "name": "双倍伤害",
+      "nameEn": "Double Damage (Phantasmal Killer)",
+      "description": "攻击造成双倍伤害",
+      "details": "X 回合内，攻击造成双倍伤害。"
+    },
+    {
+      "id": "double_tap",
+      "name": "双重打击",
+      "nameEn": "Double Tap",
+      "description": "下 X 张攻击牌打出两次",
+      "details": "你的下 X 张攻击牌会打出两次。"
+    },
+    {
+      "id": "duplication",
+      "name": "复制",
+      "nameEn": "Duplication",
+      "description": "下 X 张牌打出两次",
+      "details": "你的下 X 张牌会打出两次。"
+    },
+    {
+      "id": "echo_form",
+      "name": "回声形态",
+      "nameEn": "Echo Form",
+      "description": "每回合前 X 张牌打出两次",
+      "details": "你每回合打出的前 X 张牌会打出两次。"
+    },
+    {
+      "id": "electrodynamics",
+      "name": "电动力学",
+      "nameEn": "Electrodynamics",
+      "description": "闪电击中所有敌人",
+      "details": "闪电击中所有敌人。"
+    },
+    {
+      "id": "envenom",
+      "name": "涂毒",
+      "nameEn": "Envenom",
+      "description": "造成未被格挡的攻击伤害时施加中毒",
+      "details": "每当你造成未被格挡的攻击伤害时，施加 X 层中毒。"
+    },
+    {
+      "id": "equilibrium",
+      "name": "平衡",
+      "nameEn": "Equilibrium",
+      "description": "保留手牌 X 回合",
+      "details": "保留你的手牌 X 回合。"
+    },
+    {
+      "id": "establishment",
+      "name": "建立",
+      "nameEn": "Establishment",
+      "description": "保留牌时降低其费用",
+      "details": "每当你保留一张牌，使其费用降低 X。"
+    },
+    {
+      "id": "evolve",
+      "name": "进化",
+      "nameEn": "Evolve",
+      "description": "抽到状态牌时抽牌",
+      "details": "每当你抽到一张状态牌，抽 X 张牌。"
+    },
+    {
+      "id": "feel_no_pain",
+      "name": "无惧痛苦",
+      "nameEn": "Feel No Pain",
+      "description": "消耗牌时获得格挡",
+      "details": "每当你消耗一张牌，获得 X 点格挡。"
+    },
+    {
+      "id": "fire_breathing",
+      "name": "喷火",
+      "nameEn": "Fire Breathing",
+      "description": "抽到状态或诅咒牌时对敌人造成伤害",
+      "details": "每当你抽到一张状态或诅咒牌，对所有敌人造成 X 点伤害。"
+    },
+    {
+      "id": "flame_barrier",
+      "name": "火焰屏障",
+      "nameEn": "Flame Barrier",
+      "description": "被攻击时反弹伤害",
+      "details": "被攻击时，造成 X 点伤害反击。在下个回合开始时消失。"
+    },
+    {
+      "id": "foresight",
+      "name": "预见",
+      "nameEn": "Foresight",
+      "description": "回合开始时洞察",
+      "details": "在你的回合开始时，洞察 X。"
+    },
+    {
+      "id": "free_attack_power",
+      "name": "免费攻击",
+      "nameEn": "Free Attack Power (Swivel)",
+      "description": "下 X 张攻击牌消耗为0",
+      "details": "你的下 X 张攻击牌消耗为 0。"
+    },
+    {
+      "id": "heatsinks",
+      "name": "散热片",
+      "nameEn": "Heatsinks",
+      "description": "打出能力牌时抽牌",
+      "details": "每当你打出一张能力牌，抽 X 张牌。"
+    },
+    {
+      "id": "hello_world",
+      "name": "你好世界",
+      "nameEn": "Hello World",
+      "description": "回合开始时添加随机普通牌到手牌",
+      "details": "在你的回合开始时，将 X 张随机普通牌加入你的手牌。"
+    },
+    {
+      "id": "infinite_blades",
+      "name": "无限刀刃",
+      "nameEn": "Infinite Blades",
+      "description": "回合开始时添加小刀到手牌",
+      "details": "在你的回合开始时，将 X 张小刀加入你的手牌。"
+    },
+    {
+      "id": "juggernaut",
+      "name": "主宰",
+      "nameEn": "Juggernaut",
+      "description": "获得格挡时对敌人造成伤害",
+      "details": "每当你获得格挡，对一个随机敌人造成 X 点伤害。"
+    },
+    {
+      "id": "like_water",
+      "name": "如水",
+      "nameEn": "Like Water",
+      "description": "在平静姿态回合结束时获得格挡",
+      "details": "在你的回合结束时，如果你处于平静姿态，获得 X 点格挡。"
+    },
+    {
+      "id": "loop",
+      "name": "循环",
+      "nameEn": "Loop",
+      "description": "回合开始时触发充能球被动能力",
+      "details": "在你的回合开始时，触发你下一个充能球的被动能力 X 次。"
+    },
+    {
+      "id": "machine_learning",
+      "name": "机器学习",
+      "nameEn": "Machine Learning",
+      "description": "回合开始时额外抽牌",
+      "details": "在你的回合开始时，额外抽 X 张牌。"
+    },
+    {
+      "id": "magnetism",
+      "name": "磁性",
+      "nameEn": "Magnetism",
+      "description": "回合开始时添加随机无色牌到手牌",
+      "details": "在你的回合开始时，将 X 张随机无色牌加入你的手牌。"
+    },
+    {
+      "id": "master_reality",
+      "name": "掌控现实",
+      "nameEn": "Master Reality",
+      "description": "战斗中创建的牌会被升级",
+      "details": "每当一张牌在战斗中被创建时，将其升级。"
+    },
+    {
+      "id": "mayhem",
+      "name": "混乱",
+      "nameEn": "Mayhem",
+      "description": "回合开始时打出抽牌堆顶的牌",
+      "details": "在你的回合开始时，打出你抽牌堆顶的 X 张牌。"
+    },
+    {
+      "id": "mental_fortress",
+      "name": "精神堡垒",
+      "nameEn": "Mental Fortress",
+      "description": "切换姿态时获得格挡",
+      "details": "每当你切换姿态时，获得 X 点格挡。"
+    },
+    {
+      "id": "nightmare",
+      "name": "梦魇",
+      "nameEn": "Nightmare",
+      "description": "下回合添加选定牌到手牌",
+      "details": "下回合将 X 张选定的牌加入你的手牌。"
+    },
+    {
+      "id": "nirvana",
+      "name": "涅槃",
+      "nameEn": "Nirvana",
+      "description": "洞察时获得格挡",
+      "details": "每当你洞察时，获得 X 点格挡。"
+    },
+    {
+      "id": "noxious_fumes",
+      "name": "有毒烟雾",
+      "nameEn": "Noxious Fumes",
+      "description": "回合开始时对所有敌人施加中毒",
+      "details": "在你的回合开始时，对所有敌人施加 X 层中毒。"
+    },
+    {
+      "id": "omega",
+      "name": "欧米茄",
+      "nameEn": "Omega",
+      "description": "回合结束时对所有敌人造成伤害",
+      "details": "在你的回合结束时，对所有敌人造成 X 点伤害。"
+    },
+    {
+      "id": "panache",
+      "name": "华丽",
+      "nameEn": "Panache",
+      "description": "本回合打出5张牌后对敌人造成伤害",
+      "details": "如果你在本回合打出 5 张牌，对所有敌人造成 X 点伤害。"
+    },
+    {
+      "id": "pen_nib",
+      "name": "钢笔尖",
+      "nameEn": "Pen Nib",
+      "description": "下一次攻击造成双倍伤害",
+      "details": "你的下一次攻击造成双倍伤害。"
+    },
+    {
+      "id": "rage",
+      "name": "愤怒",
+      "nameEn": "Rage",
+      "description": "打出攻击牌时获得格挡",
+      "details": "每当你打出一张攻击牌，获得 X 点格挡。"
+    },
+    {
+      "id": "rebound",
+      "name": "反弹",
+      "nameEn": "Rebound",
+      "description": "本回合下 X 张牌放到抽牌堆顶",
+      "details": "你本回合打出的下 X 张牌将被放到你的抽牌堆顶。"
+    },
+    {
+      "id": "regen",
+      "name": "再生",
+      "nameEn": "Regen/Regeneration",
+      "description": "回合结束时恢复生命",
+      "details": "在你的回合结束时，恢复 X 点生命并将再生减少 1。"
+    },
+    {
+      "id": "repair",
+      "name": "自我修复",
+      "nameEn": "Repair (Self Repair)",
+      "description": "战斗结束时恢复生命",
+      "details": "在战斗结束时，恢复 X 点生命。"
+    },
+    {
+      "id": "rupture",
+      "name": "破裂",
+      "nameEn": "Rupture",
+      "description": "因卡牌失去生命时获得力量",
+      "details": "每当你因卡牌失去生命时，获得 X 点力量。"
+    },
+    {
+      "id": "rushdown",
+      "name": "突进",
+      "nameEn": "Rushdown",
+      "description": "进入愤怒姿态时抽牌",
+      "details": "每当你进入愤怒姿态时，抽 X 张牌。"
+    },
+    {
+      "id": "sadistic_nature",
+      "name": "施虐本性",
+      "nameEn": "Sadistic Nature",
+      "description": "对敌人施加减益时造成伤害",
+      "details": "每当你对敌人施加一个减益时，造成 X 点伤害。"
+    },
+    {
+      "id": "simmering_fury",
+      "name": " simmering_fury",
+      "nameEn": "Simmering Fury",
+      "description": "下回合进入愤怒姿态",
+      "details": "在你的下回合开始时，进入愤怒姿态。"
+    },
+    {
+      "id": "static_discharge",
+      "name": "静电释放",
+      "nameEn": "Static Discharge",
+      "description": "受到未被格挡的攻击伤害时充能闪电",
+      "details": "每当你受到未被格挡的攻击伤害时，充能 X 个闪电。"
+    },
+    {
+      "id": "storm",
+      "name": "风暴",
+      "nameEn": "Storm",
+      "description": "打出能力牌时充能闪电",
+      "details": "每当你打出一张能力牌，充能 X 个闪电。"
+    },
+    {
+      "id": "study",
+      "name": "研习",
+      "nameEn": "Study",
+      "description": "回合结束时将洞见洗入抽牌堆",
+      "details": "在你的回合结束时，将 X 张洞见洗入你的抽牌堆。"
+    },
+    {
+      "id": "surrounded",
+      "name": "被包围",
+      "nameEn": "Surrounded",
+      "description": "被从背后攻击时受到更多伤害",
+      "details": "如果被从背后攻击，受到的伤害增加 50%。"
+    },
+    {
+      "id": "the_bomb",
+      "name": "炸弹",
+      "nameEn": "The Bomb",
+      "description": "3回合后对所有敌人造成伤害",
+      "details": "在 3 个回合后，对所有敌人造成 X 点伤害。"
+    },
+    {
+      "id": "thousand_cuts",
+      "name": "千刀万剐",
+      "nameEn": "Thousand Cuts",
+      "description": "打出牌时对所有敌人造成伤害",
+      "details": "每当你打出一张牌，对所有敌人造成 X 点伤害。"
+    },
+    {
+      "id": "tools_of_the_trade",
+      "name": "交易工具",
+      "nameEn": "Tools of the Trade",
+      "description": "回合开始时抽牌并弃牌",
+      "details": "在你的回合开始时，抽 X 张牌并弃 X 张牌。"
+    },
+    {
+      "id": "wave_of_the_hand",
+      "name": "挥手",
+      "nameEn": "Wave of the Hand",
+      "description": "本回合获得格挡时对敌人施加虚弱",
+      "details": "本回合每当你获得格挡时，对所有敌人施加 X 层虚弱。"
+    },
+    {
+      "id": "well_laid_plans",
+      "name": "精心策划",
+      "nameEn": "Well-Laid Plans",
+      "description": "回合结束时保留卡牌",
+      "details": "在你的回合结束时，保留最多 X 张牌。"
+    }
+  ],
+  "enemy_buff": [
+    {
+      "id": "angry",
+      "name": "愤怒",
+      "nameEn": "Angry",
+      "description": "受到攻击伤害时获得力量",
+      "details": "受到攻击伤害时，获得 X 点力量。"
+    },
+    {
+      "id": "back_attack",
+      "name": "背后攻击",
+      "nameEn": "Back Attack",
+      "description": "从背后攻击造成更多伤害",
+      "details": "从背后攻击造成 50% 更多伤害。"
+    },
+    {
+      "id": "beat_of_death",
+      "name": "死亡之搏",
+      "nameEn": "Beat of Death",
+      "description": "你打出牌时受到伤害",
+      "details": "每当你打出一张牌，受到 X 点伤害。"
+    },
+    {
+      "id": "curiosity",
+      "name": "好奇",
+      "nameEn": "Curiosity",
+      "description": "你打出能力牌时获得力量",
+      "details": "每当你打出一张能力牌，获得 X 点力量。"
+    },
+    {
+      "id": "curl_up",
+      "name": "蜷缩",
+      "nameEn": "Curl Up",
+      "description": "受到攻击伤害时获得格挡",
+      "details": "受到攻击伤害时，蜷缩起来获得 X 点格挡（每场战斗一次）。"
+    },
+    {
+      "id": "enrage",
+      "name": "激怒",
+      "nameEn": "Enrage",
+      "description": "你打出技能牌时获得力量",
+      "details": "每当你打出一张技能牌，获得 X 点力量。"
+    },
+    {
+      "id": "explosive",
+      "name": "爆炸",
+      "nameEn": "Explosive",
+      "description": "3回合后爆炸造成伤害",
+      "details": "在 3 回合后爆炸，造成 X 点伤害。"
+    },
+    {
+      "id": "fading",
+      "name": "消逝",
+      "nameEn": "Fading",
+      "description": "X回合后死亡",
+      "details": "在 X 回合后死亡。"
+    },
+    {
+      "id": "flying",
+      "name": "飞行",
+      "nameEn": "Flying",
+      "description": "受到的攻击伤害减少",
+      "details": "下 X 次攻击受到的伤害减少 50%。"
+    },
+    {
+      "id": "invincible",
+      "name": "无敌",
+      "nameEn": "Invincible",
+      "description": "本回合只能失去有限生命",
+      "details": "本回合只能再失去 X 点生命。"
+    },
+    {
+      "id": "life_link",
+      "name": "生命链接",
+      "nameEn": "Life Link",
+      "description": "有其他黑暗之子存活时2回合后复活",
+      "details": "如果其他黑暗之子仍然存活，在 2 回合后复活。"
+    },
+    {
+      "id": "malleable",
+      "name": "可塑",
+      "nameEn": "Malleable",
+      "description": "受到攻击伤害时获得格挡并增加",
+      "details": "受到攻击伤害时，获得 X 点格挡。每次触发时获得的格挡增加 1。"
+    },
+    {
+      "id": "minion",
+      "name": "随从",
+      "nameEn": "Minion",
+      "description": "没有领袖时逃离战斗",
+      "details": "随从在没有领袖时会放弃战斗。"
+    },
+    {
+      "id": "mode_shift",
+      "name": "形态转换",
+      "nameEn": "Mode Shift",
+      "description": "受到一定伤害后切换到防御模式",
+      "details": "受到 X 点伤害后，切换到防御模式。"
+    },
+    {
+      "id": "painful_stabs",
+      "name": "痛苦刺击",
+      "nameEn": "Painful Stabs",
+      "description": "受到攻击时伤口加入弃牌堆",
+      "details": "每当你受到来自这个敌人的攻击伤害时，将 X 张伤口加入你的弃牌堆。"
+    },
+    {
+      "id": "reactive",
+      "name": "反应",
+      "nameEn": "Reactive",
+      "description": "受到攻击伤害时改变意图",
+      "details": "受到攻击伤害时，改变其意图。"
+    },
+    {
+      "id": "regenerate",
+      "name": "再生",
+      "nameEn": "Regenerate",
+      "description": "回合结束时恢复生命",
+      "details": "在其回合结束时，恢复 X 点生命。"
+    },
+    {
+      "id": "sharp_hide",
+      "name": "尖刺外皮",
+      "nameEn": "Sharp Hide",
+      "description": "打出攻击牌时受到伤害",
+      "details": "每当你打出一张攻击牌，受到 X 点伤害。"
+    },
+    {
+      "id": "shifting",
+      "name": "转移",
+      "nameEn": "Shifting",
+      "description": "失去生命时失去力量",
+      "details": "失去生命时，失去等量力量直到回合结束。"
+    },
+    {
+      "id": "split",
+      "name": "分裂",
+      "nameEn": "Split",
+      "description": "生命值低于50%时分裂成两个史莱姆",
+      "details": "当其生命值等于或低于 50% 时，将分裂成 2 个更小的史莱姆，生命值为其当前生命值。"
+    },
+    {
+      "id": "spore_cloud",
+      "name": "孢子云",
+      "nameEn": "Spore Cloud",
+      "description": "死亡时施加易伤",
+      "details": "死亡时，施加 X 层易伤。"
+    },
+    {
+      "id": "stasis",
+      "name": "停滞",
+      "nameEn": "Stasis",
+      "description": "死亡时归还偷取的卡牌",
+      "details": "死亡时，一张被偷的卡牌被归还到你的手中。"
+    },
+    {
+      "id": "strength_up",
+      "name": "力量上升",
+      "nameEn": "Strength Up",
+      "description": "回合结束时获得力量",
+      "details": "在其回合结束时，获得 X 点力量。"
+    },
+    {
+      "id": "thievery",
+      "name": "盗窃",
+      "nameEn": "Thievery",
+      "description": "攻击时偷取金币",
+      "details": "每次攻击时偷取 X 金币。"
+    },
+    {
+      "id": "time_warp",
+      "name": "时间扭曲",
+      "nameEn": "Time Warp",
+      "description": "打出12张牌后结束回合并获得力量",
+      "details": "每当你打出 12 张牌，结束你的回合并获得 X 点力量。"
+    },
+    {
+      "id": "unawakened",
+      "name": "未觉醒",
+      "nameEn": "Unawakened",
+      "description": "这个敌人尚未觉醒",
+      "details": "这个敌人尚未觉醒。"
+    }
+  ],
+  "shared_debuff": [
+    {
+      "id": "confused",
+      "name": "混乱",
+      "nameEn": "Confused",
+      "description": "抽到的卡牌费用随机",
+      "details": "每当你抽到一张牌，随机化其费用。"
+    },
+    {
+      "id": "dexterity_negative",
+      "name": "敏捷降低",
+      "nameEn": "Dexterity (Negative)",
+      "description": "获得的格挡减少",
+      "details": "使从卡牌获得的格挡减少 X。"
+    },
+    {
+      "id": "dexterity_down",
+      "name": "敏捷下降",
+      "nameEn": "Dexterity Down",
+      "description": "回合结束时失去敏捷",
+      "details": "在你的回合结束时，失去 X 点敏捷。"
+    },
+    {
+      "id": "focus_negative",
+      "name": "集中降低",
+      "nameEn": "Focus (Negative)",
+      "description": "集中减少",
+      "details": "集中减少 X。"
+    },
+    {
+      "id": "frail",
+      "name": "脆弱",
+      "nameEn": "Frail",
+      "description": "获得的格挡减少25%",
+      "details": "X 回合内，从卡牌获得的格挡减少 25%。"
+    },
+    {
+      "id": "no_draw",
+      "name": "无法抽牌",
+      "nameEn": "No Draw",
+      "description": "本回合无法抽牌",
+      "details": "你本回合无法抽牌。"
+    },
+    {
+      "id": "poison",
+      "name": "中毒",
+      "nameEn": "Poison",
+      "description": "回合开始时受到伤害",
+      "details": "在其回合开始时，失去 X 点生命，然后将中毒减少 1。"
+    },
+    {
+      "id": "shackled",
+      "name": "束缚",
+      "nameEn": "Shackled",
+      "description": "回合结束时获得力量（力量损失是暂时的）",
+      "details": "在其回合结束时，获得 X 点力量（力量损失是暂时的）。"
+    },
+    {
+      "id": "slow",
+      "name": "迟缓",
+      "nameEn": "Slow",
+      "description": "打出牌时受到更多攻击伤害",
+      "details": "每当你打出一张牌，本回合受到的攻击伤害增加 10%。"
+    },
+    {
+      "id": "strength_negative",
+      "name": "力量降低",
+      "nameEn": "Strength (Negative)",
+      "description": "攻击伤害减少",
+      "details": "攻击伤害减少 X。"
+    },
+    {
+      "id": "strength_down",
+      "name": "力量下降",
+      "nameEn": "Strength Down",
+      "description": "回合结束时失去力量",
+      "details": "在你的回合结束时，失去 X 点力量。"
+    },
+    {
+      "id": "vulnerable",
+      "name": "易伤",
+      "nameEn": "Vulnerable",
+      "description": "受到的攻击伤害增加50%",
+      "details": "X 回合内，受到的攻击伤害增加 50%。"
+    },
+    {
+      "id": "weak",
+      "name": "虚弱",
+      "nameEn": "Weak",
+      "description": "攻击伤害减少25%",
+      "details": "X 回合内，攻击造成的伤害减少 25%。"
+    }
+  ],
+  "player_debuff": [
+    {
+      "id": "bias",
+      "name": "偏差",
+      "nameEn": "Bias",
+      "description": "回合开始时失去集中",
+      "details": "在你的回合开始时，失去 X 点集中。"
+    },
+    {
+      "id": "choked",
+      "name": "窒息",
+      "nameEn": "Choked",
+      "description": "打出牌时目标敌人失去生命",
+      "details": "本回合每当你打出一张牌，目标敌人失去 X 点生命。"
+    },
+    {
+      "id": "constricted",
+      "name": "紧缩",
+      "nameEn": "Constricted",
+      "description": "回合结束时受到伤害",
+      "details": "在你的回合结束时，受到 X 点伤害。"
+    },
+    {
+      "id": "draw_reduction",
+      "name": "抽牌减少",
+      "nameEn": "Draw Reduction",
+      "description": "下 X 回合少抽1张牌",
+      "details": "下 X 回合少抽 1 张牌。"
+    },
+    {
+      "id": "entangled",
+      "name": "缠绕",
+      "nameEn": "Entangled",
+      "description": "本回合无法打出攻击牌",
+      "details": "你本回合无法打出任何攻击牌。"
+    },
+    {
+      "id": "fasting",
+      "name": "禁食",
+      "nameEn": "Fasting",
+      "description": "每回合开始时获得能量减少",
+      "details": "每回合开始时获得的能量减少 X。"
+    },
+    {
+      "id": "hex",
+      "name": "妖术",
+      "nameEn": "Hex",
+      "description": "打出非攻击牌时眩晕加入抽牌堆",
+      "details": "每当你打出一张非攻击牌，将 X 张眩晕加入你的抽牌堆。"
+    },
+    {
+      "id": "lock_on",
+      "name": "锁定",
+      "nameEn": "Lock-On",
+      "description": "闪电和黑暗球对目标敌人造成更多伤害",
+      "details": "闪电和黑暗球对目标敌人造成的伤害增加 50%。"
+    },
+    {
+      "id": "mark",
+      "name": "印记",
+      "nameEn": "Mark",
+      "description": "打出压力点时失去生命",
+      "details": "每当你打出压力点时，所有带有印记的敌人失去 X 点生命。"
+    },
+    {
+      "id": "no_block",
+      "name": "无法格挡",
+      "nameEn": "No Block",
+      "description": "下 X 回合无法从卡牌获得格挡",
+      "details": "你下 X 回合无法从卡牌获得格挡。"
+    },
+    {
+      "id": "wraith_form",
+      "name": "幽灵形态",
+      "nameEn": "Wraith Form",
+      "description": "回合结束时失去敏捷",
+      "details": "在你的回合结束时，失去 X 点敏捷。"
+    }
+  ],
+  "enemy_debuff": [
+    {
+      "id": "block_return",
+      "name": "格挡返还",
+      "nameEn": "Block Return",
+      "description": "攻击此敌人时获得格挡",
+      "details": "每当你攻击这个敌人时，获得 X 点格挡。"
+    },
+    {
+      "id": "corpse_explosion",
+      "name": "尸爆",
+      "nameEn": "Corpse Explosion",
+      "description": "死亡时对敌人造成伤害",
+      "details": "死亡时，该敌人对其最大生命值 X 倍的伤害给所有其他敌人。"
+    }
+  ],
+  "other": [
+    {
+      "id": "block",
+      "name": "格挡",
+      "nameEn": "Block",
+      "description": "抵消下一次受到的伤害",
+      "details": "抵消下一次受到的伤害。回合结束时（无壁垒情况下）重置为0。"
+    },
+    {
+      "id": "energy",
+      "name": "能量",
+      "nameEn": "Energy",
+      "description": "用于打出卡牌",
+      "details": "每回合开始时获得3点能量。打出卡牌需要消耗相应能量。"
+    }
+  ]
+}
