@@ -132,6 +132,20 @@ export async function initDatabase() {
       )
     `);
 
+    // 创建concepts表（概念/术语解释）
+    await db.exec(`
+      CREATE TABLE IF NOT EXISTS concepts (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        name_en TEXT NOT NULL,
+        description TEXT NOT NULL,
+        category TEXT,
+        meta_info TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
     // 插入默认角色数据（如果表为空）
     const count = await db.get('SELECT COUNT(*) as count FROM characters');
     if (count.count === 0) {
@@ -454,36 +468,98 @@ export async function deleteRelic(id) {
 
 // ==================== 数据导入 ====================
 
-export async function importCardsFromJson(cardsData) {
+// 检查卡牌是否存在
+async function cardExists(db, cardId, characterId) {
+  const result = await db.get('SELECT 1 FROM cards WHERE card_id = ? AND character_id = ?', [cardId, characterId]);
+  return !!result;
+}
+
+// 检查遗物是否存在
+async function relicExists(db, relicId) {
+  const result = await db.get('SELECT 1 FROM relics WHERE id = ?', [relicId]);
+  return !!result;
+}
+
+// 检查buff是否存在
+async function buffExists(db, buffId) {
+  const result = await db.get('SELECT 1 FROM buffs WHERE id = ?', [buffId]);
+  return !!result;
+}
+
+// 检查敌人是否存在
+async function enemyExists(db, enemyId) {
+  const result = await db.get('SELECT 1 FROM enemies WHERE id = ?', [enemyId]);
+  return !!result;
+}
+
+// 检查药水是否存在
+async function potionExists(db, potionId) {
+  const result = await db.get('SELECT 1 FROM potions WHERE id = ?', [potionId]);
+  return !!result;
+}
+
+// 检查概念是否存在
+async function conceptExists(db, conceptId) {
+  const result = await db.get('SELECT 1 FROM concepts WHERE id = ?', [conceptId]);
+  return !!result;
+}
+
+export async function importCardsFromJson(cardsData, clearExisting = false) {
   const db = await openDb();
   try {
-    // 清空现有卡牌
-    await db.run('DELETE FROM cards');
+    if (clearExisting) {
+      // 清空现有卡牌
+      await db.run('DELETE FROM cards');
+    }
     
     let count = 0;
+    let updated = 0;
     for (const [characterId, cards] of Object.entries(cardsData)) {
       for (const card of cards) {
-        await db.run(`
-          INSERT INTO cards (card_id, name, name_en, character_id, cost, type, type_en, rarity, rarity_en, description)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `, [
-          card.id,
-          card.name,
-          card.nameEn,
-          characterId,
-          typeof card.cost === 'string' ? -1 : card.cost,
-          card.type,
-          card.typeEn,
-          card.rarity,
-          card.rarityEn,
-          card.description
-        ]);
-        count++;
+        const exists = await cardExists(db, card.id, characterId);
+        if (exists) {
+          // 更新现有卡牌
+          await db.run(`
+            UPDATE cards 
+            SET name = ?, name_en = ?, cost = ?, type = ?, type_en = ?, rarity = ?, rarity_en = ?, description = ?, updated_at = CURRENT_TIMESTAMP
+            WHERE card_id = ? AND character_id = ?
+          `, [
+            card.name,
+            card.nameEn,
+            typeof card.cost === 'string' ? -1 : card.cost,
+            card.type,
+            card.typeEn,
+            card.rarity,
+            card.rarityEn,
+            card.description,
+            card.id,
+            characterId
+          ]);
+          updated++;
+        } else {
+          // 插入新卡牌
+          await db.run(`
+            INSERT INTO cards (card_id, name, name_en, character_id, cost, type, type_en, rarity, rarity_en, description)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          `, [
+            card.id,
+            card.name,
+            card.nameEn,
+            characterId,
+            typeof card.cost === 'string' ? -1 : card.cost,
+            card.type,
+            card.typeEn,
+            card.rarity,
+            card.rarityEn,
+            card.description
+          ]);
+          count++;
+        }
       }
     }
 
-    console.log('卡牌数据导入成功');
-    return { success: true, count };
+    console.log(`卡牌数据导入成功: 新增 ${count} 个, 更新 ${updated} 个`);
+    return { success: true, count, updated };
   } catch (error) {
     console.error('导入卡牌失败:', error);
     throw error;
@@ -492,36 +568,62 @@ export async function importCardsFromJson(cardsData) {
   }
 }
 
-export async function importRelicsFromJson(relicsData) {
+export async function importRelicsFromJson(relicsData, clearExisting = false) {
   const db = await openDb();
   try {
-    // 清空现有遗物
-    await db.run('DELETE FROM relics');
+    if (clearExisting) {
+      // 清空现有遗物
+      await db.run('DELETE FROM relics');
+    }
     
     let count = 0;
+    let updated = 0;
     for (const [category, relics] of Object.entries(relicsData)) {
       for (const relic of relics) {
-        await db.run(`
-          INSERT INTO relics (id, name, name_en, rarity, description, flavor, character_id, is_boss, is_event, is_shop)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `, [
-          relic.id,
-          relic.name,
-          relic.nameEn,
-          relic.rarity,
-          relic.description,
-          relic.flavor || '',
-          relic.character || null,
-          category === 'boss' ? 1 : 0,
-          category === 'event' ? 1 : 0,
-          category === 'shop' ? 1 : 0
-        ]);
-        count++;
+        const exists = await relicExists(db, relic.id);
+        if (exists) {
+          // 更新现有遗物
+          await db.run(`
+            UPDATE relics 
+            SET name = ?, name_en = ?, rarity = ?, description = ?, flavor = ?, character_id = ?, is_boss = ?, is_event = ?, is_shop = ?, updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+          `, [
+            relic.name,
+            relic.nameEn,
+            relic.rarity,
+            relic.description,
+            relic.flavor || '',
+            relic.character || null,
+            category === 'boss' ? 1 : 0,
+            category === 'event' ? 1 : 0,
+            category === 'shop' ? 1 : 0,
+            relic.id
+          ]);
+          updated++;
+        } else {
+          // 插入新遗物
+          await db.run(`
+            INSERT INTO relics (id, name, name_en, rarity, description, flavor, character_id, is_boss, is_event, is_shop)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          `, [
+            relic.id,
+            relic.name,
+            relic.nameEn,
+            relic.rarity,
+            relic.description,
+            relic.flavor || '',
+            relic.character || null,
+            category === 'boss' ? 1 : 0,
+            category === 'event' ? 1 : 0,
+            category === 'shop' ? 1 : 0
+          ]);
+          count++;
+        }
       }
     }
 
-    console.log('遗物数据导入成功');
-    return { success: true, count };
+    console.log(`遗物数据导入成功: 新增 ${count} 个, 更新 ${updated} 个`);
+    return { success: true, count, updated };
   } catch (error) {
     console.error('导入遗物失败:', error);
     throw error;
@@ -562,13 +664,9 @@ export async function setMetaConfig(category, key, value, description) {
 export async function getAllBuffs() {
   const db = await openDb();
   try {
-    const buffs = await db.all('SELECT * FROM buffs ORDER BY type, name_en');
-    // 按类型分组（支持所有 buff 分类）
-    const grouped = {};
+    const buffs = await db.all('SELECT * FROM buffs ORDER BY target, type, name_en');
+    // 解析 meta_info
     for (const buff of buffs) {
-      const category = buff.type.toLowerCase();
-      if (!grouped[category]) grouped[category] = [];
-      
       if (buff.meta_info) {
         try {
           buff.meta = JSON.parse(buff.meta_info);
@@ -576,9 +674,8 @@ export async function getAllBuffs() {
           buff.meta = {};
         }
       }
-      grouped[category].push(buff);
     }
-    return grouped;
+    return buffs;
   } finally {
     await db.close();
   }
@@ -649,24 +746,54 @@ export async function deleteBuff(id) {
   }
 }
 
-export async function importBuffsFromJson(buffsData) {
+export async function importBuffsFromJson(buffsData, clearExisting = false) {
   const db = await openDb();
   try {
-    // 清空现有buffs
-    await db.run('DELETE FROM buffs');
+    if (clearExisting) {
+      // 清空现有buffs
+      await db.run('DELETE FROM buffs');
+    }
     
     let count = 0;
-    for (const [category, items] of Object.entries(buffsData)) {
-      for (const buff of items) {
+    let updated = 0;
+    // 支持新格式（扁平数组）和旧格式（分类对象）
+    const buffsArray = Array.isArray(buffsData) ? buffsData : Object.entries(buffsData).flatMap(([category, items]) => {
+      // 旧格式转换：根据类别名判断 type
+      return items.map(buff => ({
+        ...buff,
+        type: category.includes('debuff') ? 'debuff' : 'buff'
+      }));
+    });
+    
+    for (const buff of buffsArray) {
+      const exists = await buffExists(db, buff.id);
+      if (exists) {
+        // 更新现有buff
+        await db.run(`
+          UPDATE buffs 
+          SET name = ?, name_en = ?, type = ?, description = ?, details = ?, stackable = ?, updated_at = CURRENT_TIMESTAMP
+          WHERE id = ?
+        `, [
+          buff.name,
+          buff.nameEn || buff.name_en || buff.id,
+          buff.type || 'buff',
+          buff.description || '',
+          buff.details || '',
+          buff.stackable ? 1 : 0,
+          buff.id
+        ]);
+        updated++;
+      } else {
+        // 插入新buff
         await db.run(`
           INSERT INTO buffs (id, name, name_en, type, description, details, stackable)
           VALUES (?, ?, ?, ?, ?, ?, ?)
         `, [
           buff.id,
           buff.name,
-          buff.nameEn || buff.name_en,
-          category,
-          buff.description,
+          buff.nameEn || buff.name_en || buff.id,
+          buff.type || 'buff',
+          buff.description || '',
           buff.details || '',
           buff.stackable ? 1 : 0
         ]);
@@ -674,8 +801,8 @@ export async function importBuffsFromJson(buffsData) {
       }
     }
 
-    console.log('Buff数据导入成功');
-    return { success: true, count };
+    console.log(`Buff数据导入成功: 新增 ${count} 个, 更新 ${updated} 个`);
+    return { success: true, count, updated };
   } catch (error) {
     console.error('导入Buff失败:', error);
     throw error;
@@ -776,13 +903,16 @@ export async function deleteEnemy(id) {
   }
 }
 
-export async function importEnemiesFromJson(enemiesData) {
+export async function importEnemiesFromJson(enemiesData, clearExisting = false) {
   const db = await openDb();
   try {
-    // 清空现有enemies
-    await db.run('DELETE FROM enemies');
+    if (clearExisting) {
+      // 清空现有enemies
+      await db.run('DELETE FROM enemies');
+    }
     
     let count = 0;
+    let updated = 0;
     for (const [category, items] of Object.entries(enemiesData)) {
       // 将原始分类映射到标准分类
       let standardCategory = 'normal';
@@ -796,25 +926,197 @@ export async function importEnemiesFromJson(enemiesData) {
       }
       
       for (const enemy of items) {
+        const exists = await enemyExists(db, enemy.id);
+        if (exists) {
+          // 更新现有敌人
+          await db.run(`
+            UPDATE enemies 
+            SET name = ?, name_en = ?, category = ?, description = ?, details = ?, updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+          `, [
+            enemy.name,
+            enemy.nameEn || enemy.name_en,
+            standardCategory,
+            enemy.description || '',
+            enemy.details,
+            enemy.id
+          ]);
+          updated++;
+        } else {
+          // 插入新敌人
+          await db.run(`
+            INSERT INTO enemies (id, name, name_en, category, description, details)
+            VALUES (?, ?, ?, ?, ?, ?)
+          `, [
+            enemy.id,
+            enemy.name,
+            enemy.nameEn || enemy.name_en,
+            standardCategory,
+            enemy.description || '',
+            enemy.details
+          ]);
+          count++;
+        }
+      }
+    }
+
+    console.log(`敌人数据导入成功: 新增 ${count} 个, 更新 ${updated} 个`);
+    return { success: true, count, updated };
+  } catch (error) {
+    console.error('导入敌人失败:', error);
+    throw error;
+  } finally {
+    await db.close();
+  }
+}
+
+// ==================== Concepts CRUD ====================
+
+export async function getAllConcepts() {
+  const db = await openDb();
+  try {
+    const concepts = await db.all('SELECT * FROM concepts ORDER BY category, name_en');
+    // 按类别分组
+    const grouped = {};
+    for (const concept of concepts) {
+      const category = concept.category || 'other';
+      if (!grouped[category]) grouped[category] = [];
+      
+      if (concept.meta_info) {
+        try {
+          concept.meta = JSON.parse(concept.meta_info);
+        } catch (e) {
+          concept.meta = {};
+        }
+      }
+      grouped[category].push(concept);
+    }
+    return grouped;
+  } finally {
+    await db.close();
+  }
+}
+
+export async function getConceptById(id) {
+  const db = await openDb();
+  try {
+    const concept = await db.get('SELECT * FROM concepts WHERE id = ?', id);
+    if (concept && concept.meta_info) {
+      try {
+        concept.meta = JSON.parse(concept.meta_info);
+      } catch (e) {
+        concept.meta = {};
+      }
+    }
+    return concept;
+  } finally {
+    await db.close();
+  }
+}
+
+export async function createConcept(concept) {
+  const db = await openDb();
+  try {
+    const {
+      id, name, name_en, description, category, meta_info
+    } = concept;
+    
+    await db.run(`
+      INSERT INTO concepts (id, name, name_en, description, category, meta_info)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `, [id, name, name_en, description, category || '', meta_info ? JSON.stringify(meta_info) : null]);
+    
+    return await getConceptById(id);
+  } finally {
+    await db.close();
+  }
+}
+
+export async function updateConcept(id, concept) {
+  const db = await openDb();
+  try {
+    const {
+      name, name_en, description, category, meta_info
+    } = concept;
+    
+    await db.run(`
+      UPDATE concepts 
+      SET name = ?, name_en = ?, description = ?, category = ?, meta_info = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `, [name, name_en, description, category || '', meta_info ? JSON.stringify(meta_info) : null, id]);
+    
+    return await getConceptById(id);
+  } finally {
+    await db.close();
+  }
+}
+
+export async function deleteConcept(id) {
+  const db = await openDb();
+  try {
+    await db.run('DELETE FROM concepts WHERE id = ?', id);
+    return { success: true };
+  } finally {
+    await db.close();
+  }
+}
+
+export async function importConceptsFromJson(conceptsData, clearExisting = false) {
+  const db = await openDb();
+  try {
+    if (clearExisting) {
+      // 清空现有concepts
+      await db.run('DELETE FROM concepts');
+    }
+    
+    let count = 0;
+    let updated = 0;
+    // 支持新格式（扁平数组）和旧格式（分类对象）
+    const conceptsArray = Array.isArray(conceptsData) ? conceptsData : Object.entries(conceptsData).flatMap(([category, items]) => {
+      return items.map(concept => ({
+        ...concept,
+        category: concept.category || category
+      }));
+    });
+    
+    for (const concept of conceptsArray) {
+      const exists = await conceptExists(db, concept.id);
+      if (exists) {
+        // 更新现有概念
         await db.run(`
-          INSERT INTO enemies (id, name, name_en, category, description, details)
+          UPDATE concepts 
+          SET name = ?, name_en = ?, description = ?, category = ?, meta_info = ?, updated_at = CURRENT_TIMESTAMP
+          WHERE id = ?
+        `, [
+          concept.name,
+          concept.name_en || concept.nameEn,
+          concept.description || '',
+          concept.category || 'other',
+          concept.meta_info ? JSON.stringify(concept.meta_info) : null,
+          concept.id
+        ]);
+        updated++;
+      } else {
+        // 插入新概念
+        await db.run(`
+          INSERT INTO concepts (id, name, name_en, description, category, meta_info)
           VALUES (?, ?, ?, ?, ?, ?)
         `, [
-          enemy.id,
-          enemy.name,
-          enemy.nameEn || enemy.name_en,
-          standardCategory,
-          enemy.description || '',
-          enemy.details
+          concept.id,
+          concept.name,
+          concept.name_en || concept.nameEn,
+          concept.description || '',
+          concept.category || 'other',
+          concept.meta_info ? JSON.stringify(concept.meta_info) : null
         ]);
         count++;
       }
     }
 
-    console.log('敌人数据导入成功');
-    return { success: true, count };
+    console.log(`概念数据导入成功: 新增 ${count} 个, 更新 ${updated} 个`);
+    return { success: true, count, updated };
   } catch (error) {
-    console.error('导入敌人失败:', error);
+    console.error('导入概念失败:', error);
     throw error;
   } finally {
     await db.close();
@@ -881,28 +1183,48 @@ export async function deletePotion(id) {
 }
 
 
-export async function importPotionsFromJson(potionsData) {
+export async function importPotionsFromJson(potionsData, clearExisting = false) {
   const db = await openDb();
   try {
-    // 清空现有potions
-    await db.run('DELETE FROM potions');
+    if (clearExisting) {
+      // 清空现有potions
+      await db.run('DELETE FROM potions');
+    }
     
     let count = 0;
+    let updated = 0;
     for (const potion of potionsData) {
-      await db.run(`
-        INSERT INTO potions (id, name, name_en, description)
-        VALUES (?, ?, ?, ?)
-      `, [
-        potion.id,
-        potion.name,
-        potion.nameEn || potion.name_en,
-        potion.description
-      ]);
-      count++;
+      const exists = await potionExists(db, potion.id);
+      if (exists) {
+        // 更新现有药水
+        await db.run(`
+          UPDATE potions 
+          SET name = ?, name_en = ?, description = ?, updated_at = CURRENT_TIMESTAMP
+          WHERE id = ?
+        `, [
+          potion.name,
+          potion.nameEn || potion.name_en,
+          potion.description,
+          potion.id
+        ]);
+        updated++;
+      } else {
+        // 插入新药水
+        await db.run(`
+          INSERT INTO potions (id, name, name_en, description)
+          VALUES (?, ?, ?, ?)
+        `, [
+          potion.id,
+          potion.name,
+          potion.nameEn || potion.name_en,
+          potion.description
+        ]);
+        count++;
+      }
     }
 
-    console.log('药水数据导入成功');
-    return { success: true, count };
+    console.log(`药水数据导入成功: 新增 ${count} 个, 更新 ${updated} 个`);
+    return { success: true, count, updated };
   } catch (error) {
     console.error('导入药水失败:', error);
     throw error;

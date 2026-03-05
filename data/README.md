@@ -9,6 +9,7 @@
 - `enemies.json` - 敌人数据
 - `buffs.json` - Buff/Debuff 数据
 - `potions.json` - 药水数据
+- `concepts.json` - 概念/术语解释数据
 - `game-knowledge.md` - 游戏知识库
 
 ## 数据管理

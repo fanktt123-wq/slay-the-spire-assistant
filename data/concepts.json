@@ -1,0 +1,106 @@
+{
+  "basic": [
+    {
+      "id": "energy",
+      "name": "能量",
+      "name_en": "Energy",
+      "description": "每回合可以使用的资源，用于打出卡牌。每回合开始时恢复至上限（通常为3点）。",
+      "category": "basic"
+    },
+    {
+      "id": "exhaust",
+      "name": "消耗",
+      "name_en": "Exhaust",
+      "description": "卡牌打出后进入消耗堆，而非弃牌堆。消耗的卡牌在本场战斗中无法再次使用（除非有特殊效果回收）。",
+      "category": "basic"
+    },
+    {
+      "id": "innate",
+      "name": "固有",
+      "name_en": "Innate",
+      "description": "每场战斗开始时，固有卡牌必定出现在起始手牌中。",
+      "category": "basic"
+    },
+    {
+      "id": "ethereal",
+      "name": "虚无",
+      "name_en": "Ethereal",
+      "description": "如果虚无卡牌在手牌中且未被打出，则在回合结束时被消耗。",
+      "category": "basic"
+    },
+    {
+      "id": "retain",
+      "name": "保留",
+      "name_en": "Retain",
+      "description": "保留卡牌在回合结束时不会被放入弃牌堆，可以保留到下一回合。",
+      "category": "basic"
+    }
+  ],
+  "combat": [
+    {
+      "id": "block",
+      "name": "格挡",
+      "name_en": "Block",
+      "description": "抵挡即将到来的伤害。格挡在敌人回合结束后会清零。",
+      "category": "combat"
+    },
+    {
+      "id": "vulnerable",
+      "name": "易伤",
+      "name_en": "Vulnerable",
+      "description": "受到的攻击伤害增加50%。",
+      "category": "combat"
+    },
+    {
+      "id": "weak",
+      "name": "虚弱",
+      "name_en": "Weak",
+      "description": "造成的攻击伤害减少25%。",
+      "category": "combat"
+    },
+    {
+      "id": "frail",
+      "name": "脆弱",
+      "name_en": "Frail",
+      "description": "从卡牌获得的格挡减少25%。",
+      "category": "combat"
+    },
+    {
+      "id": "poison",
+      "name": "中毒",
+      "name_en": "Poison",
+      "description": "每回合结束时造成中毒层数的伤害，然后中毒层数减1。中毒无视格挡。",
+      "category": "combat"
+    }
+  ],
+  "mechanics": [
+    {
+      "id": "upgrade",
+      "name": "升级",
+      "name_en": "Upgrade",
+      "description": "在营火处或使用特定卡牌/遗物可以升级卡牌，通常会增强卡牌的效果或降低费用。",
+      "category": "mechanics"
+    },
+    {
+      "id": "transform",
+      "name": "变化",
+      "name_en": "Transform",
+      "description": "将卡牌随机变成另一张卡牌（通常是同稀有度）。",
+      "category": "mechanics"
+    },
+    {
+      "id": "scry",
+      "name": "预见",
+      "name_en": "Scry",
+      "description": "查看抽牌堆顶部的若干张牌，可以选择将其中任意数量的牌放入弃牌堆。",
+      "category": "mechanics"
+    },
+    {
+      "id": "stance",
+      "name": "姿态",
+      "name_en": "Stance",
+      "description": "观者特有的机制，包括平静、愤怒、神格三种姿态，每种姿态有特殊效果。",
+      "category": "mechanics"
+    }
+  ]
+}

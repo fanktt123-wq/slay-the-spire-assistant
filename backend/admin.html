@@ -166,15 +166,29 @@
       display: flex;
       align-items: center;
       gap: 10px;
+      flex-wrap: wrap;
     }
     
-    .search-box input {
+    .search-box input, .search-box select {
       padding: 10px 15px;
       border: 1px solid var(--border-color);
       border-radius: 6px;
       background: var(--bg-dark);
       color: var(--text-light);
+    }
+    
+    .search-box input {
       width: 250px;
+    }
+    
+    .search-box select {
+      min-width: 120px;
+      cursor: pointer;
+    }
+    
+    .search-box select option {
+      background: var(--bg-dark);
+      color: var(--text-light);
     }
     
     .search-box input:focus {
@@ -514,6 +528,7 @@
     <button class="nav-tab" onclick="switchTab('potions')">药水管理</button>
     <button class="nav-tab" onclick="switchTab('buffs')">Buff/Debuff</button>
     <button class="nav-tab" onclick="switchTab('enemies')">敌人数据</button>
+    <button class="nav-tab" onclick="switchTab('concepts')">概念管理</button>
   </div>
 
   <div class="container">
@@ -547,6 +562,23 @@
           <select id="card-character-filter" onchange="searchCards()">
             <option value="">所有角色</option>
           </select>
+          <select id="card-rarity-filter" onchange="searchCards()">
+            <option value="">所有稀有度</option>
+            <option value="基础">基础 (Basic)</option>
+            <option value="普通">普通 (Common)</option>
+            <option value="罕见">罕见 (Uncommon)</option>
+            <option value="稀有">稀有 (Rare)</option>
+            <option value="诅咒">诅咒 (Curse)</option>
+            <option value="特殊">特殊 (Special)</option>
+          </select>
+          <select id="card-type-filter" onchange="searchCards()">
+            <option value="">所有类型</option>
+            <option value="攻击">攻击</option>
+            <option value="技能">技能</option>
+            <option value="能力">能力</option>
+            <option value="诅咒">诅咒</option>
+            <option value="状态">状态</option>
+          </select>
           <input type="text" id="card-search" placeholder="搜索卡牌..." onkeyup="searchCards()">
         </div>
         <button class="btn btn-primary" onclick="openCardModal()">+ 添加卡牌</button>
@@ -573,6 +605,26 @@
     <div id="relics-tab" class="tab-content">
       <div class="toolbar">
         <div class="search-box">
+          <select id="relic-character-filter" onchange="searchRelics()">
+            <option value="">所有角色</option>
+          </select>
+          <select id="relic-rarity-filter" onchange="searchRelics()">
+            <option value="">所有稀有度</option>
+            <option value="Starter">初始 (Starter)</option>
+            <option value="Common">普通 (Common)</option>
+            <option value="Uncommon">罕见 (Uncommon)</option>
+            <option value="Rare">稀有 (Rare)</option>
+            <option value="Boss">Boss</option>
+            <option value="Shop">商店 (Shop)</option>
+            <option value="Special">特殊 (Special)</option>
+          </select>
+          <select id="relic-special-filter" onchange="searchRelics()">
+            <option value="">所有类型</option>
+            <option value="normal">普通</option>
+            <option value="boss">Boss</option>
+            <option value="event">事件</option>
+            <option value="shop">商店</option>
+          </select>
           <input type="text" id="relic-search" placeholder="搜索遗物..." onkeyup="searchRelics()">
         </div>
         <button class="btn btn-primary" onclick="openRelicModal()">+ 添加遗物</button>
@@ -605,14 +657,13 @@
       <table class="data-table">
         <thead>
           <tr>
-            <th>ID</th>
             <th>名称</th>
             <th>描述</th>
             <th>操作</th>
           </tr>
         </thead>
         <tbody id="potions-table-body">
-          <tr><td colspan="4" class="loading"><div class="spinner"></div></td></tr>
+          <tr><td colspan="3" class="loading"><div class="spinner"></div></td></tr>
         </tbody>
       </table>
     </div>
@@ -621,15 +672,10 @@
     <div id="buffs-tab" class="tab-content">
       <div class="toolbar">
         <div class="search-box">
-          <select id="buff-type-filter" onchange="loadBuffs()">
+          <select id="buff-type-filter" onchange="searchBuffs()">
             <option value="">所有类型</option>
-            <option value="shared_buff">共享增益</option>
-            <option value="player_buff">玩家增益</option>
-            <option value="enemy_buff">敌人增益</option>
-            <option value="shared_debuff">共享减益</option>
-            <option value="player_debuff">玩家减益</option>
-            <option value="enemy_debuff">敌人减益</option>
-            <option value="other">其他</option>
+            <option value="buff">Buff (增益)</option>
+            <option value="debuff">Debuff (减益)</option>
           </select>
           <input type="text" id="buff-search" placeholder="搜索Buff/Debuff..." onkeyup="searchBuffs()">
         </div>
@@ -640,13 +686,12 @@
           <tr>
             <th>名称</th>
             <th>类型</th>
-            <th>可叠加</th>
             <th>详细说明</th>
             <th>操作</th>
           </tr>
         </thead>
         <tbody id="buffs-table-body">
-          <tr><td colspan="5" class="loading"><div class="spinner"></div></td></tr>
+          <tr><td colspan="4" class="loading"><div class="spinner"></div></td></tr>
         </tbody>
       </table>
     </div>
@@ -667,13 +712,38 @@
           <tr>
             <th>名称</th>
             <th>种类</th>
-            <th>描述</th>
             <th>详细情况</th>
             <th>操作</th>
           </tr>
         </thead>
         <tbody id="enemies-table-body">
-          <tr><td colspan="5" class="loading"><div class="spinner"></div></td></tr>
+          <tr><td colspan="4" class="loading"><div class="spinner"></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Concepts 管理 -->
+    <div id="concepts-tab" class="tab-content">
+      <div class="toolbar">
+        <div class="search-box">
+          <select id="concept-category-filter" onchange="searchConcepts()">
+            <option value="">所有分类</option>
+          </select>
+          <input type="text" id="concept-search" placeholder="搜索概念..." onkeyup="searchConcepts()">
+        </div>
+        <button class="btn btn-primary" onclick="openConceptModal()">+ 添加概念</button>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>名称</th>
+            <th>分类</th>
+            <th>描述</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="concepts-table-body">
+          <tr><td colspan="4" class="loading"><div class="spinner"></div></td></tr>
         </tbody>
       </table>
     </div>
@@ -920,13 +990,8 @@
             <div class="form-group">
               <label>类型</label>
               <select id="buff-type" required>
-                <option value="shared_buff">共享增益</option>
-                <option value="player_buff">玩家增益</option>
-                <option value="enemy_buff">敌人增益</option>
-                <option value="shared_debuff">共享减益</option>
-                <option value="player_debuff">玩家减益</option>
-                <option value="enemy_debuff">敌人减益</option>
-                <option value="other">其他</option>
+                <option value="buff">Buff (增益)</option>
+                <option value="debuff">Debuff (减益)</option>
               </select>
             </div>
           </div>
@@ -1055,6 +1120,53 @@
     </div>
   </div>
 
+  <!-- 概念编辑弹窗 -->
+  <div id="concept-modal" class="modal-overlay">
+    <div class="modal" style="max-width: 700px;">
+      <div class="modal-header">
+        <h2 id="concept-modal-title">添加概念</h2>
+        <button class="modal-close" onclick="closeModal('concept-modal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="concept-form">
+          <input type="hidden" id="concept-original-id">
+          <div class="form-row">
+            <div class="form-group">
+              <label>ID（唯一标识）</label>
+              <input type="text" id="concept-id" placeholder="例如: energy" required>
+            </div>
+            <div class="form-group">
+              <label>分类</label>
+              <input type="text" id="concept-category" placeholder="例如: basic, combat, mechanics" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>中文名称</label>
+              <input type="text" id="concept-name" placeholder="例如: 能量" required>
+            </div>
+            <div class="form-group">
+              <label>英文名称</label>
+              <input type="text" id="concept-name-en" placeholder="例如: Energy" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>描述</label>
+            <textarea id="concept-description" placeholder="概念的详细解释..." style="min-height: 150px;" required></textarea>
+          </div>
+          <div class="form-group">
+            <label>Meta信息（JSON格式，可选）</label>
+            <textarea id="concept-meta" placeholder='{"key": "value"}'></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeModal('concept-modal')">取消</button>
+        <button class="btn btn-primary" onclick="saveConcept()">保存</button>
+      </div>
+    </div>
+  </div>
+
   <div id="notification" class="notification"></div>
 
   <script>
@@ -1072,6 +1184,7 @@
       loadPotions();
       loadBuffs();
       loadEnemies();
+      loadConcepts();
     });
 
     // 切换标签
@@ -1128,6 +1241,7 @@
       const cardSelect = document.getElementById('card-character');
       const cardFilter = document.getElementById('card-character-filter');
       const relicSelect = document.getElementById('relic-character');
+      const relicFilter = document.getElementById('relic-character-filter');
       
       const options = characters.map(c => 
         `<option value="${c.id}">${c.name} (${c.name_en})</option>`
@@ -1136,6 +1250,7 @@
       cardSelect.innerHTML = '<option value="">选择角色</option>' + options;
       cardFilter.innerHTML = '<option value="">所有角色</option>' + options;
       relicSelect.innerHTML = '<option value="">无</option>' + options;
+      relicFilter.innerHTML = '<option value="">所有角色</option>' + options;
     }
 
     // 加载卡牌
@@ -1196,10 +1311,18 @@
     function searchCards() {
       const query = document.getElementById('card-search').value.toLowerCase();
       const charFilter = document.getElementById('card-character-filter').value;
+      const rarityFilter = document.getElementById('card-rarity-filter').value;
+      const typeFilter = document.getElementById('card-type-filter').value;
       
       let filtered = cards;
       if (charFilter) {
         filtered = filtered.filter(c => c.character_id === charFilter);
+      }
+      if (rarityFilter) {
+        filtered = filtered.filter(c => c.rarity === rarityFilter);
+      }
+      if (typeFilter) {
+        filtered = filtered.filter(c => c.type === typeFilter);
       }
       if (query) {
         filtered = filtered.filter(c => 
@@ -1261,13 +1384,40 @@
     // 搜索遗物
     function searchRelics() {
       const query = document.getElementById('relic-search').value.toLowerCase();
-      const filtered = query 
-        ? relics.filter(r => 
-            r.name.toLowerCase().includes(query) ||
-            r.name_en.toLowerCase().includes(query) ||
-            r.description.toLowerCase().includes(query)
-          )
-        : relics;
+      const charFilter = document.getElementById('relic-character-filter').value;
+      const rarityFilter = document.getElementById('relic-rarity-filter').value;
+      const specialFilter = document.getElementById('relic-special-filter').value;
+      
+      let filtered = relics;
+      if (charFilter) {
+        filtered = filtered.filter(r => r.character_id === charFilter);
+      }
+      if (rarityFilter) {
+        filtered = filtered.filter(r => r.rarity === rarityFilter);
+      }
+      if (specialFilter) {
+        switch(specialFilter) {
+          case 'boss':
+            filtered = filtered.filter(r => r.is_boss);
+            break;
+          case 'event':
+            filtered = filtered.filter(r => r.is_event);
+            break;
+          case 'shop':
+            filtered = filtered.filter(r => r.is_shop);
+            break;
+          case 'normal':
+            filtered = filtered.filter(r => !r.is_boss && !r.is_event && !r.is_shop);
+            break;
+        }
+      }
+      if (query) {
+        filtered = filtered.filter(r => 
+          r.name.toLowerCase().includes(query) ||
+          r.name_en.toLowerCase().includes(query) ||
+          r.description.toLowerCase().includes(query)
+        );
+      }
       renderRelics(filtered);
     }
 
@@ -1535,18 +1685,28 @@
 
     // 从JSON导入
     async function importFromJson() {
-      if (!confirm('这将从 data/cards.json 和 data/relics.json 导入数据，现有数据将被清空。是否继续？')) return;
+      const clearExisting = confirm('是否清空所有现有数据？\n\n点击"确定"：清空现有数据后重新导入（全新导入）\n点击"取消"：保留现有数据，仅添加/更新新数据（增量导入）');
+      
+      if (clearExisting) {
+        if (!confirm('⚠️ 警告：这将删除所有现有数据并重新从JSON导入！此操作不可撤销！\n\n确定要继续吗？')) return;
+      }
       
       try {
-        const res = await fetch('/api/admin/import', { method: 'POST' });
+        const res = await fetch('/api/admin/import', { 
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ clearExisting })
+        });
         const result = await res.json();
-        showNotification(`导入成功！卡牌: ${result.cards.count}个, 遗物: ${result.relics.count}个, 药水: ${result.potions?.count || 0}个, Buff: ${result.buffs.count}个, 敌人: ${result.enemies.count}个`, 'success');
+        const mode = clearExisting ? '全新导入' : '增量导入';
+        showNotification(`${mode}成功！新增: 卡牌${result.cards.count}/${result.cards.updated || 0}, 遗物${result.relics.count}/${result.relics.updated || 0}, 概念${result.concepts?.count || 0}/${result.concepts?.updated || 0}`, 'success');
         loadCharacters();
         loadCards();
         loadRelics();
         loadPotions();
         loadBuffs();
         loadEnemies();
+        loadConcepts();
       } catch (e) {
         showNotification('导入失败: ' + e.message, 'error');
       }
@@ -1569,7 +1729,7 @@
     function renderPotions(filtered = potions) {
       const tbody = document.getElementById('potions-table-body');
       if (filtered.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" class="empty-state"><div class="empty-state-icon">🧪</div><p>暂无药水数据</p></td></tr>';
+        tbody.innerHTML = '<tr><td colspan="3" class="empty-state"><div class="empty-state-icon">🧪</div><p>暂无药水数据</p></td></tr>';
         return;
       }
       
@@ -1577,7 +1737,6 @@
         const desc = p.description.length > 50 ? p.description.substring(0, 50) + '...' : p.description;
         return `
           <tr>
-            <td><code>${p.id}</code></td>
             <td>${p.name} <small style="color:var(--text-muted)">(${p.name_en})</small></td>
             <td>${desc}</td>
             <td>
@@ -1697,28 +1856,18 @@
     function renderBuffs(filtered = buffs) {
       const tbody = document.getElementById('buffs-table-body');
       if (filtered.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><div class="empty-state-icon">⚡</div><p>暂无Buff/Debuff数据</p></td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" class="empty-state"><div class="empty-state-icon">⚡</div><p>暂无Buff/Debuff数据</p></td></tr>';
         return;
       }
       
       tbody.innerHTML = filtered.map(b => {
-        const typeLabels = { 
-          shared_buff: '共享增益', 
-          player_buff: '玩家增益', 
-          enemy_buff: '敌人增益', 
-          shared_debuff: '共享减益', 
-          player_debuff: '玩家减益', 
-          enemy_debuff: '敌人减益', 
-          other: '其他' 
-        };
+        const typeLabels = { buff: 'Buff', debuff: 'Debuff' };
         const details = b.details && b.details.length > 60 ? b.details.substring(0, 60) + '...' : (b.details || b.description || '-');
-        const stackableMark = b.stackable === 1 || b.stackable === true ? '✓' : '';
         
         return `
           <tr>
             <td>${b.name} <small style="color:var(--text-muted)">(${b.name_en})</small></td>
             <td><span class="badge badge-${b.type}">${typeLabels[b.type] || b.type}</span></td>
-            <td style="text-align:center">${stackableMark}</td>
             <td title="${b.details || b.description || ''}">${details}</td>
             <td>
               <div class="actions">
@@ -1850,19 +1999,17 @@
     function renderEnemies(filtered = enemies) {
       const tbody = document.getElementById('enemies-table-body');
       if (filtered.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><div class="empty-state-icon">👹</div><p>暂无敌人数据</p></td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" class="empty-state"><div class="empty-state-icon">👹</div><p>暂无敌人数据</p></td></tr>';
         return;
       }
       
       tbody.innerHTML = filtered.map(e => {
-        const desc = e.description && e.description.length > 30 ? e.description.substring(0, 30) + '...' : (e.description || '-');
-        const detailsPreview = e.details.length > 50 ? e.details.substring(0, 50) + '...' : e.details;
+        const detailsPreview = e.details.length > 80 ? e.details.substring(0, 80) + '...' : e.details;
         
         return `
           <tr>
             <td>${e.name} <small style="color:var(--text-muted)">(${e.name_en})</small></td>
             <td>${e.category}</td>
-            <td title="${e.description || ''}">${desc}</td>
             <td title="${e.details}">${detailsPreview}</td>
             <td>
               <div class="actions">
@@ -1887,7 +2034,6 @@
         filtered = filtered.filter(e => 
           e.name.toLowerCase().includes(query) ||
           e.name_en.toLowerCase().includes(query) ||
-          e.description.toLowerCase().includes(query) ||
           e.details.toLowerCase().includes(query)
         );
       }
@@ -1957,6 +2103,144 @@
         if (!res.ok) throw new Error(await res.text());
         showNotification('敌人删除成功', 'success');
         loadEnemies();
+      } catch (e) {
+        showNotification('删除失败: ' + e.message, 'error');
+      }
+    }
+
+    // ==================== Concepts 操作 ====================
+    
+    let concepts = [];
+    let conceptCategories = [];
+    
+    async function loadConcepts() {
+      try {
+        const res = await fetch('/api/admin/concepts');
+        const data = await res.json();
+        // 扁平化数据
+        concepts = [];
+        conceptCategories = Object.keys(data);
+        updateConceptCategoryFilter();
+        for (const [category, items] of Object.entries(data)) {
+          items.forEach(c => concepts.push({ ...c, category }));
+        }
+        renderConcepts();
+      } catch (e) {
+        showNotification('加载概念失败: ' + e.message, 'error');
+      }
+    }
+    
+    function updateConceptCategoryFilter() {
+      const select = document.getElementById('concept-category-filter');
+      const options = conceptCategories.map(c => `<option value="${c}">${c}</option>`).join('');
+      select.innerHTML = '<option value="">所有分类</option>' + options;
+    }
+    
+    function renderConcepts(filtered = concepts) {
+      const tbody = document.getElementById('concepts-table-body');
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="empty-state"><div class="empty-state-icon">📖</div><p>暂无概念数据</p></td></tr>';
+        return;
+      }
+      
+      tbody.innerHTML = filtered.map(c => {
+        const desc = c.description.length > 60 ? c.description.substring(0, 60) + '...' : c.description;
+        
+        return `
+          <tr>
+            <td>${c.name} <small style="color:var(--text-muted)">(${c.name_en})</small></td>
+            <td><span class="badge badge-other">${c.category}</span></td>
+            <td title="${c.description}">${desc}</td>
+            <td>
+              <div class="actions">
+                <button class="btn btn-secondary btn-small" onclick="editConcept('${c.id}')">编辑</button>
+                <button class="btn btn-danger btn-small" onclick="deleteConcept('${c.id}')">删除</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+    
+    function searchConcepts() {
+      const query = document.getElementById('concept-search').value.toLowerCase();
+      const categoryFilter = document.getElementById('concept-category-filter').value;
+      
+      let filtered = concepts;
+      if (categoryFilter) {
+        filtered = filtered.filter(c => c.category === categoryFilter);
+      }
+      if (query) {
+        filtered = filtered.filter(c => 
+          c.name.toLowerCase().includes(query) ||
+          c.name_en.toLowerCase().includes(query) ||
+          c.description.toLowerCase().includes(query)
+        );
+      }
+      renderConcepts(filtered);
+    }
+    
+    function openConceptModal() {
+      document.getElementById('concept-form').reset();
+      document.getElementById('concept-original-id').value = '';
+      document.getElementById('concept-modal-title').textContent = '添加概念';
+      openModal('concept-modal');
+    }
+    
+    function editConcept(id) {
+      const c = concepts.find(concept => concept.id === id);
+      if (!c) return;
+      
+      document.getElementById('concept-original-id').value = c.id;
+      document.getElementById('concept-id').value = c.id;
+      document.getElementById('concept-name').value = c.name;
+      document.getElementById('concept-name-en').value = c.name_en;
+      document.getElementById('concept-category').value = c.category;
+      document.getElementById('concept-description').value = c.description;
+      document.getElementById('concept-meta').value = c.meta_info || '';
+      document.getElementById('concept-modal-title').textContent = '编辑概念';
+      openModal('concept-modal');
+    }
+    
+    async function saveConcept() {
+      const originalId = document.getElementById('concept-original-id').value;
+      const data = {
+        id: document.getElementById('concept-id').value,
+        name: document.getElementById('concept-name').value,
+        name_en: document.getElementById('concept-name-en').value,
+        category: document.getElementById('concept-category').value,
+        description: document.getElementById('concept-description').value,
+        meta_info: document.getElementById('concept-meta').value || null
+      };
+
+      try {
+        const url = originalId ? `/api/admin/concepts/${originalId}` : '/api/admin/concepts';
+        const method = originalId ? 'PUT' : 'POST';
+        
+        const res = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        
+        if (!res.ok) throw new Error(await res.text());
+        
+        showNotification(originalId ? '概念更新成功' : '概念创建成功', 'success');
+        closeModal('concept-modal');
+        loadConcepts();
+      } catch (e) {
+        showNotification('保存失败: ' + e.message, 'error');
+      }
+    }
+    
+    async function deleteConcept(id) {
+      if (!confirm('确定要删除这个概念吗？')) return;
+      
+      try {
+        const res = await fetch(`/api/admin/concepts/${id}`, { method: 'DELETE' });
+        if (!res.ok) throw new Error(await res.text());
+        showNotification('概念删除成功', 'success');
+        loadConcepts();
       } catch (e) {
         showNotification('删除失败: ' + e.message, 'error');
       }

@@ -41,7 +41,13 @@ import {
   createPotion,
   updatePotion,
   deletePotion,
-  importPotionsFromJson
+  importPotionsFromJson,
+  getAllConcepts,
+  getConceptById,
+  createConcept,
+  updateConcept,
+  deleteConcept,
+  importConceptsFromJson
 } from './database.js';
 
 dotenv.config();
@@ -149,6 +155,22 @@ async function loadGameData() {
         console.log('药水数据从JSON导入成功');
       } catch (fileErr) {
         console.log('potions.json 不存在，跳过导入');
+      }
+    }
+    
+    // 加载concepts数据
+    let conceptsData = await getAllConcepts();
+    const conceptsCount = Object.values(conceptsData).reduce((sum, items) => sum + items.length, 0);
+    const hasConcepts = conceptsCount > 0;
+    
+    if (!hasConcepts) {
+      try {
+        console.log('数据库中概念为空，从JSON导入...');
+        const conceptsJson = JSON.parse(await fs.readFile(path.join(dataDir, 'concepts.json'), 'utf-8'));
+        await importConceptsFromJson(conceptsJson);
+        console.log('概念数据从JSON导入成功');
+      } catch (fileErr) {
+        console.log('concepts.json 不存在，跳过导入');
       }
     }
 
@@ -301,19 +323,25 @@ app.get('/api/characters', async (req, res) => {
 app.get('/api/buffs', async (req, res) => {
   try {
     const buffs = await getAllBuffs();
-    // 转换为前端期望的格式
-    const formatted = {};
-    for (const [type, items] of Object.entries(buffs)) {
-      formatted[type] = items.map(b => ({
+    // 转换为前端期望的格式（按类型分组，保持兼容）
+    const formatted = { buff: [], debuff: [] };
+    for (const b of buffs) {
+      const item = {
         id: b.id,
         name: b.name,
         nameEn: b.name_en,
+        target: b.target,
         type: b.type,
         description: b.description,
         details: b.details || '',
         stackable: b.stackable === 1,
         meta: b.meta || {}
-      }));
+      };
+      if (b.type === 'debuff') {
+        formatted.debuff.push(item);
+      } else {
+        formatted.buff.push(item);
+      }
     }
     res.json(formatted);
   } catch (error) {
@@ -342,6 +370,29 @@ app.get('/api/enemies', async (req, res) => {
     res.json(formatted);
   } catch (error) {
     console.error('获取敌人失败:', error);
+    res.status(500).json({ error: '数据库读取失败: ' + error.message });
+  }
+});
+
+// 获取所有概念/术语数据
+app.get('/api/concepts', async (req, res) => {
+  try {
+    const concepts = await getAllConcepts();
+    // 转换为前端期望的格式
+    const formatted = {};
+    for (const [category, items] of Object.entries(concepts)) {
+      formatted[category] = items.map(c => ({
+        id: c.id,
+        name: c.name,
+        nameEn: c.name_en,
+        description: c.description,
+        category: c.category,
+        meta: c.meta || {}
+      }));
+    }
+    res.json(formatted);
+  } catch (error) {
+    console.error('获取概念失败:', error);
     res.status(500).json({ error: '数据库读取失败: ' + error.message });
   }
 });
@@ -604,47 +655,105 @@ app.delete('/api/admin/potions/:id', async (req, res) => {
   }
 });
 
-// 从JSON导入数据
+// 概念/术语管理
+app.get('/api/admin/concepts', async (req, res) => {
+  try {
+    const concepts = await getAllConcepts();
+    res.json(concepts);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/admin/concepts', async (req, res) => {
+  try {
+    const concept = await createConcept(req.body);
+    res.json(concept);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.put('/api/admin/concepts/:id', async (req, res) => {
+  try {
+    const concept = await updateConcept(req.params.id, req.body);
+    res.json(concept);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.delete('/api/admin/concepts/:id', async (req, res) => {
+  try {
+    await deleteConcept(req.params.id);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// 从JSON导入数据（增量导入，不会清空现有数据）
 app.post('/api/admin/import', async (req, res) => {
   try {
+    const { clearExisting = false } = req.body;
     const dataDir = path.join(__dirname, '../data');
-    const cardsJson = JSON.parse(await fs.readFile(path.join(dataDir, 'cards.json'), 'utf-8'));
-    const relicsJson = JSON.parse(await fs.readFile(path.join(dataDir, 'relics.json'), 'utf-8'));
     
-    const cardsResult = await importCardsFromJson(cardsJson);
-    const relicsResult = await importRelicsFromJson(relicsJson);
+    // 导入cards（如果存在）
+    let cardsResult = { success: true, count: 0, updated: 0 };
+    try {
+      const cardsJson = JSON.parse(await fs.readFile(path.join(dataDir, 'cards.json'), 'utf-8'));
+      cardsResult = await importCardsFromJson(cardsJson, clearExisting);
+      cardsData = await getAllCards();
+    } catch (e) {
+      console.log('cards.json 不存在或导入失败，跳过');
+    }
     
-    // 刷新内存数据
-    cardsData = await getAllCards();
-    relicsData = await getAllRelics();
+    // 导入relics（如果存在）
+    let relicsResult = { success: true, count: 0, updated: 0 };
+    try {
+      const relicsJson = JSON.parse(await fs.readFile(path.join(dataDir, 'relics.json'), 'utf-8'));
+      relicsResult = await importRelicsFromJson(relicsJson, clearExisting);
+      relicsData = await getAllRelics();
+    } catch (e) {
+      console.log('relics.json 不存在或导入失败，跳过');
+    }
     
     // 导入buffs（如果存在）
-    let buffsResult = { success: true, count: 0 };
+    let buffsResult = { success: true, count: 0, updated: 0 };
     try {
       const buffsJson = JSON.parse(await fs.readFile(path.join(dataDir, 'buffs.json'), 'utf-8'));
-      buffsResult = await importBuffsFromJson(buffsJson);
+      buffsResult = await importBuffsFromJson(buffsJson, clearExisting);
       buffsData = await getAllBuffs();
     } catch (e) {
       console.log('buffs.json 不存在或导入失败，跳过');
     }
     
     // 导入enemies（如果存在）
-    let enemiesResult = { success: true, count: 0 };
+    let enemiesResult = { success: true, count: 0, updated: 0 };
     try {
       const enemiesJson = JSON.parse(await fs.readFile(path.join(dataDir, 'enemies.json'), 'utf-8'));
-      enemiesResult = await importEnemiesFromJson(enemiesJson);
+      enemiesResult = await importEnemiesFromJson(enemiesJson, clearExisting);
       enemiesData = await getAllEnemies();
     } catch (e) {
       console.log('enemies.json 不存在或导入失败，跳过');
     }
     
     // 导入potions（如果存在）
-    let potionsResult = { success: true, count: 0 };
+    let potionsResult = { success: true, count: 0, updated: 0 };
     try {
       const potionsJson = JSON.parse(await fs.readFile(path.join(dataDir, 'potions.json'), 'utf-8'));
-      potionsResult = await importPotionsFromJson(potionsJson);
+      potionsResult = await importPotionsFromJson(potionsJson, clearExisting);
     } catch (e) {
       console.log('potions.json 不存在或导入失败，跳过');
+    }
+    
+    // 导入concepts（如果存在）
+    let conceptsResult = { success: true, count: 0, updated: 0 };
+    try {
+      const conceptsJson = JSON.parse(await fs.readFile(path.join(dataDir, 'concepts.json'), 'utf-8'));
+      conceptsResult = await importConceptsFromJson(conceptsJson, clearExisting);
+    } catch (e) {
+      console.log('concepts.json 不存在或导入失败，跳过');
     }
     
     res.json({ 
@@ -652,7 +761,9 @@ app.post('/api/admin/import', async (req, res) => {
       relics: relicsResult, 
       buffs: buffsResult, 
       enemies: enemiesResult,
-      potions: potionsResult
+      potions: potionsResult,
+      concepts: conceptsResult,
+      clearExisting
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
