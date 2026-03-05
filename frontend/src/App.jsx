@@ -140,9 +140,6 @@ function App() {
   const [thinkingContent, setThinkingContent] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   
-  // 聊天面板展开状态
-  const [chatExpanded, setChatExpanded] = useState(false);
-  
   // 动态角色分类配置
   const [characterColors, setCharacterColors] = useState(DEFAULT_CHARACTER_COLORS);
 
@@ -813,10 +810,10 @@ function App() {
         </div>
       )}
 
-      {/* Main Content - 新布局：左(卡组) 右(卡牌库) */}
+      {/* Main Content - 新布局：左(卡牌库) 中(当前卡组) 右(AI助手) */}
       <div className="main-content">
-        {/* Left: Deck Builder (卡组构建区) */}
-        <div className="deck-builder-panel">
+        {/* Left: Card Library (卡牌库) */}
+        <div className="card-library-panel">
           {/* 角色选择 */}
           <div className="character-tabs">
             {Object.entries(characterColors).map(([key, info]) => (
@@ -847,6 +844,105 @@ function App() {
             ))}
           </div>
 
+          {/* 搜索和筛选 */}
+          <div className="library-toolbar">
+            <div className="search-box">
+              <span className="search-icon">🔍</span>
+              <input
+                type="text"
+                placeholder="Search cards..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="search-input"
+              />
+              {searchQuery && (
+                <button onClick={() => setSearchQuery('')} className="clear-search">×</button>
+              )}
+            </div>
+            
+            <div className="filter-row">
+              <div className="filter-group">
+                <select value={filters.rarity} onChange={(e) => setFilters({...filters, rarity: e.target.value})}>
+                  <option value="all">All Rarities</option>
+                  <option value="Basic">Basic</option>
+                  <option value="Common">Common</option>
+                  <option value="Uncommon">Uncommon</option>
+                  <option value="Rare">Rare</option>
+                  <option value="Special">Special</option>
+                </select>
+              </div>
+              <div className="filter-group">
+                <select value={filters.type} onChange={(e) => setFilters({...filters, type: e.target.value})}>
+                  <option value="all">All Types</option>
+                  <option value="Attack">Attack</option>
+                  <option value="Skill">Skill</option>
+                  <option value="Power">Power</option>
+                  <option value="Curse">Curse</option>
+                </select>
+              </div>
+              <div className="filter-group">
+                <select value={filters.cost} onChange={(e) => setFilters({...filters, cost: e.target.value})}>
+                  <option value="all">All Costs</option>
+                  <option value="0">0</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="X">X</option>
+                </select>
+              </div>
+              <label className="upgrade-checkbox">
+                <input 
+                  type="checkbox" 
+                  checked={filters.showUpgraded} 
+                  onChange={(e) => setFilters({...filters, showUpgraded: e.target.checked})} 
+                />
+                <span>Upgraded</span>
+              </label>
+            </div>
+          </div>
+
+          {/* 卡牌列表 */}
+          <div className="library-content">
+            <div className="section-title">
+              <span>Card Library</span>
+              <span className="card-count">{filteredCards.length} cards</span>
+            </div>
+            <div className="cards-list">
+              {filteredCards.map(card => (
+                <div 
+                  key={card.id} 
+                  className={`card-list-item ${card.typeEn} ${card.rarityEn}`}
+                  onClick={() => addCard(card.id)}
+                  title={`Click to add to deck`}
+                >
+                  <div className={`list-cost ${card.cost === 0 ? 'zero' : ''}`}>
+                    {getCostDisplay(card.cost)}
+                  </div>
+                  <div className="list-name">{card.nameEn}</div>
+                  <div className="list-type" style={{ color: TYPE_COLORS[card.typeEn] || '#7f8c8d' }}>
+                    {card.typeEn}
+                  </div>
+                  <div className="list-rarity" style={{ color: RARITY_COLORS[card.rarityEn] || '#7f8c8d' }}>
+                    {card.rarityEn}
+                  </div>
+                  <div className="list-description">
+                    {card.description}
+                  </div>
+                </div>
+              ))}
+              {filteredCards.length === 0 && (
+                <div className="empty-search">
+                  <div className="empty-icon">🔍</div>
+                  <p>No cards found</p>
+                  {searchQuery && <button onClick={() => setSearchQuery('')} className="clear-btn">Clear Search</button>}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Center: Current Deck (当前卡组) */}
+        <div className="deck-builder-panel">
           {/* 卡组统计 */}
           <div className="deck-stats-bar">
             <div className="stat-item">
@@ -919,7 +1015,7 @@ function App() {
               {Object.keys(selectedCards).length === 0 && (
                 <div className="empty-hint">
                   <div className="empty-icon">🎴</div>
-                  <p>Select cards from the right panel</p>
+                  <p>Select cards from the left panel</p>
                 </div>
               )}
             </div>
@@ -951,251 +1047,137 @@ function App() {
           </div>
         </div>
 
-        {/* Right: Card Library (卡牌库) */}
-        <div className="card-library-panel">
-          {/* 搜索和筛选 */}
-          <div className="library-toolbar">
-            <div className="search-box">
-              <span className="search-icon">🔍</span>
-              <input
-                type="text"
-                placeholder="Search cards..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="search-input"
-              />
-              {searchQuery && (
-                <button onClick={() => setSearchQuery('')} className="clear-search">×</button>
-              )}
-            </div>
-            
-            <div className="filter-row">
-              <div className="filter-group">
-                <select value={filters.rarity} onChange={(e) => setFilters({...filters, rarity: e.target.value})}>
-                  <option value="all">All Rarities</option>
-                  <option value="Basic">Basic</option>
-                  <option value="Common">Common</option>
-                  <option value="Uncommon">Uncommon</option>
-                  <option value="Rare">Rare</option>
-                  <option value="Special">Special</option>
-                </select>
-              </div>
-              <div className="filter-group">
-                <select value={filters.type} onChange={(e) => setFilters({...filters, type: e.target.value})}>
-                  <option value="all">All Types</option>
-                  <option value="Attack">Attack</option>
-                  <option value="Skill">Skill</option>
-                  <option value="Power">Power</option>
-                  <option value="Curse">Curse</option>
-                </select>
-              </div>
-              <div className="filter-group">
-                <select value={filters.cost} onChange={(e) => setFilters({...filters, cost: e.target.value})}>
-                  <option value="all">All Costs</option>
-                  <option value="0">0</option>
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                  <option value="X">X</option>
-                </select>
-              </div>
-              <label className="upgrade-checkbox">
-                <input 
-                  type="checkbox" 
-                  checked={filters.showUpgraded} 
-                  onChange={(e) => setFilters({...filters, showUpgraded: e.target.checked})} 
-                />
-                <span>Upgraded</span>
-              </label>
-            </div>
-          </div>
-
-          {/* 卡牌网格 */}
-          <div className="library-content">
-            <div className="section-title">
-              <span>Card Library</span>
-              <span className="card-count">{filteredCards.length} cards</span>
-            </div>
-            <div className="cards-grid">
-              {filteredCards.map(card => (
-                <div 
-                  key={card.id} 
-                  className={`game-card ${card.typeEn} ${card.rarityEn}`}
-                  onClick={() => addCard(card.id)}
-                  title={`Click to add to deck`}
-                >
-                  <div className={`card-cost ${card.cost === 0 ? 'zero' : ''}`}>
-                    {getCostDisplay(card.cost)}
-                  </div>
-                  <div className="card-title">{card.nameEn}</div>
-                  <div className="card-artwork">
-                    <div className="artwork-placeholder">
-                      {card.typeEn === 'Attack' && '⚔️'}
-                      {card.typeEn === 'Skill' && '🛡️'}
-                      {card.typeEn === 'Power' && '✨'}
-                      {card.typeEn === 'Curse' && '💀'}
-                      {card.typeEn === 'Status' && '⚡'}
-                    </div>
-                  </div>
-                  <div className="card-type-badge" style={{ background: TYPE_COLORS[card.typeEn] || '#7f8c8d' }}>
-                    {card.typeEn}
-                  </div>
-                  <div className="card-description">
-                    {card.description}
-                  </div>
-                </div>
-              ))}
-              {filteredCards.length === 0 && (
-                <div className="empty-search">
-                  <div className="empty-icon">🔍</div>
-                  <p>No cards found</p>
-                  {searchQuery && <button onClick={() => setSearchQuery('')} className="clear-btn">Clear Search</button>}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Bottom: Chat Panel */}
-      <div className={`chat-panel ${chatExpanded ? 'expanded' : ''}`}>
-        <div className="chat-header" onClick={() => setChatExpanded(!chatExpanded)}>
-          <span className="chat-title">💬 AI Assistant</span>
-          <div className="chat-header-actions">
+        {/* Right: AI Assistant Panel */}
+        <div className="ai-assistant-panel">
+          <div className="ai-panel-header">
+            <span className="ai-panel-title">🤖 AI Assistant</span>
             {conversationHistory.length > 0 && (
               <button 
-                onClick={(e) => { e.stopPropagation(); clearConversation(); }} 
+                onClick={clearConversation} 
                 className="clear-conversation-btn" 
                 title="Clear Conversation"
               >
                 🗑️ Clear
               </button>
             )}
-            <button 
-              className="expand-btn"
-              onClick={(e) => { e.stopPropagation(); setChatExpanded(!chatExpanded); }}
-              title={chatExpanded ? '收起' : '展开'}
-            >
-              {chatExpanded ? '⏬' : '⏫'}
-            </button>
           </div>
-        </div>
-        
-        {/* 卡组状态 */}
-        {(getTotalCardCount() > 0 || selectedRelics.length > 0) && (
-          <div className="deck-status-bar">
-            <span className="deck-status-badge">
-              <strong>{characterColors[character]?.name}</strong>
-              <span>Act {gameProgress.act}-{gameProgress.floor}</span>
-              <span className="separator">|</span>
-              <span>{getTotalCardCount()} cards</span>
-              {selectedRelics.length > 0 && <span>{selectedRelics.length} relics</span>}
-            </span>
-            <span className={`send-indicator ${knowledgeOptions.sendDeckInfo ? 'active' : 'inactive'}`}>
-              {knowledgeOptions.sendDeckInfo ? '✓ Will send deck info' : '✗ Deck info hidden'}
-            </span>
-          </div>
-        )}
-        
-        <div className="chat-content">
-          {loading && !isStreaming && (
-            <div className="loading">
-              <div className="spinner"></div>
-              <span>Thinking...</span>
+          
+          {/* 卡组状态 */}
+          {(getTotalCardCount() > 0 || selectedRelics.length > 0) && (
+            <div className="deck-status-bar">
+              <span className="deck-status-badge">
+                <strong>{characterColors[character]?.name}</strong>
+                <span>Act {gameProgress.act}-{gameProgress.floor}</span>
+                <span className="separator">|</span>
+                <span>{getTotalCardCount()} cards</span>
+                {selectedRelics.length > 0 && <span>{selectedRelics.length} relics</span>}
+              </span>
+              <span className={`send-indicator ${knowledgeOptions.sendDeckInfo ? 'active' : 'inactive'}`}>
+                {knowledgeOptions.sendDeckInfo ? '✓ Will send deck info' : '✗ Deck info hidden'}
+              </span>
             </div>
           )}
           
-          {conversationHistory.length > 0 || isStreaming ? (
-            <div className="conversation-history">
-              {conversationHistory.map((msg, idx) => (
-                <div key={idx} className={`message ${msg.role}`}>
-                  <div className="message-header">
-                    {msg.role === 'user' ? '👤 You' : '🤖 Assistant'}
-                  </div>
-                  {msg.thinking && (
-                    <div className="thinking-box">
-                      <div className="thinking-header">
-                        <span className="thinking-icon">💭</span>
-                        <span>Thinking</span>
-                      </div>
-                      <div className="thinking-content">
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                          {msg.thinking}
-                        </ReactMarkdown>
-                      </div>
+          <div className="chat-content">
+            {loading && !isStreaming && (
+              <div className="loading">
+                <div className="spinner"></div>
+                <span>Thinking...</span>
+              </div>
+            )}
+            
+            {conversationHistory.length > 0 || isStreaming ? (
+              <div className="conversation-history">
+                {conversationHistory.map((msg, idx) => (
+                  <div key={idx} className={`message ${msg.role}`}>
+                    <div className="message-header">
+                      {msg.role === 'user' ? '👤 You' : '🤖 Assistant'}
                     </div>
-                  )}
-                  <div className="message-content">
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                      {msg.content}
-                    </ReactMarkdown>
-                  </div>
-                </div>
-              ))}
-              
-              {isStreaming && (
-                <div className="message assistant streaming">
-                  <div className="message-header">
-                    🤖 Assistant
-                    <span className="streaming-indicator">
-                      <span className="dot"></span>
-                      <span className="dot"></span>
-                      <span className="dot"></span>
-                    </span>
-                  </div>
-                  {thinkingContent && (
-                    <div className="thinking-box">
-                      <div className="thinking-header">
-                        <span className="thinking-icon">💭</span>
-                        <span>Thinking</span>
+                    {msg.thinking && (
+                      <div className="thinking-box">
+                        <div className="thinking-header">
+                          <span className="thinking-icon">💭</span>
+                          <span>Thinking</span>
+                        </div>
+                        <div className="thinking-content">
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                            {msg.thinking}
+                          </ReactMarkdown>
+                        </div>
                       </div>
-                      <div className="thinking-content">
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                          {thinkingContent}
-                        </ReactMarkdown>
-                      </div>
+                    )}
+                    <div className="message-content">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {msg.content}
+                      </ReactMarkdown>
                     </div>
-                  )}
-                  <div className="message-content">
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                      {streamingContent}
-                    </ReactMarkdown>
                   </div>
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="empty-chat">
-              <div className="empty-icon">🎮</div>
-              <p>Build your deck on the left, then ask questions here</p>
-              <p className="hint-text">e.g., "分析这个构筑" / "Should I remove any cards?"</p>
-            </div>
-          )}
-        </div>
-        
-        <div className="chat-input-section">
-          <div className="chat-input-wrapper">
-            <textarea
-              className="chat-input"
-              placeholder={getTotalCardCount() > 0 
-                ? "Ask about your deck..." 
-                : "Ask anything about Slay the Spire..."}
-              value={followUpMessage}
-              onChange={(e) => setFollowUpMessage(e.target.value)}
-              onKeyPress={handleKeyPress}
-              disabled={loading}
-              rows={2}
-            />
-            <button 
-              onClick={sendMessage} 
-              disabled={loading || !followUpMessage.trim()}
-              className="send-btn"
-            >
-              {loading ? '...' : '➤'}
-            </button>
+                ))}
+                
+                {isStreaming && (
+                  <div className="message assistant streaming">
+                    <div className="message-header">
+                      🤖 Assistant
+                      <span className="streaming-indicator">
+                        <span className="dot"></span>
+                        <span className="dot"></span>
+                        <span className="dot"></span>
+                      </span>
+                    </div>
+                    {thinkingContent && (
+                      <div className="thinking-box">
+                        <div className="thinking-header">
+                          <span className="thinking-icon">💭</span>
+                          <span>Thinking</span>
+                        </div>
+                        <div className="thinking-content">
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                            {thinkingContent}
+                          </ReactMarkdown>
+                        </div>
+                      </div>
+                    )}
+                    <div className="message-content">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {streamingContent}
+                      </ReactMarkdown>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="empty-chat">
+                <div className="empty-icon">🎮</div>
+                <p>Build your deck on the left, then ask questions here</p>
+                <p className="hint-text">e.g., "分析这个构筑" / "Should I remove any cards?"</p>
+              </div>
+            )}
           </div>
-          <div className="chat-hint">
-            Press Enter to send, Shift+Enter for new line
+          
+          <div className="chat-input-section">
+            <div className="chat-input-wrapper">
+              <textarea
+                className="chat-input"
+                placeholder={getTotalCardCount() > 0 
+                  ? "Ask about your deck..." 
+                  : "Ask anything about Slay the Spire..."}
+                value={followUpMessage}
+                onChange={(e) => setFollowUpMessage(e.target.value)}
+                onKeyPress={handleKeyPress}
+                disabled={loading}
+                rows={2}
+              />
+              <button 
+                onClick={sendMessage} 
+                disabled={loading || !followUpMessage.trim()}
+                className="send-btn"
+              >
+                {loading ? '...' : '➤'}
+              </button>
+            </div>
+            <div className="chat-hint">
+              Press Enter to send, Shift+Enter for new line
+            </div>
           </div>
         </div>
       </div>
